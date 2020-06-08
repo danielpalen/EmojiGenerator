@@ -13,9 +13,7 @@
 *.gif
 *.giff
 
-# Ignore output ordner
+# Ignore folders
 /output/
-
-
-# Ignore data ordner
 /data/
+/emoji-data/

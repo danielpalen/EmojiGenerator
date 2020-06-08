@@ -5,6 +5,7 @@ import imageio
 import numpy as np
 from tensorflow.keras import layers
 import tensorflow as tf
+import sys
 
 """
     | Fields | Description |
@@ -37,7 +38,7 @@ for i in range(len(data)):
 
 # ---------- Extracting the images ----------- #
 
-im_path = f'emoji-datasource-apple/img/apple/sheets-256/32.png'
+im_path = f'../emoji-data/sheet_apple_32.png'
 pixel = 32
 
 # Remember this!!! This is how to read and write png preserving quality
@@ -70,6 +71,8 @@ print(imgs[1])
 
 plt.imshow(imgs[1])
 plt.show()
+
+sys.exit()
 
 # ---------- CREATE MODELS ----------- #
 
