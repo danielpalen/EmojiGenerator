@@ -14,11 +14,13 @@ class EmojiReader:
     def read_images(self, images_base_path, filter=None): # Filter could be a filter functino to select s
         images = [{
             'meta' : d,
-            'image': read_single_image(images_base_path, d['image']) 
-        } for d in emoji_meta_data]
+            'image': _read_single_image(images_base_path, d['image']) 
+        } for d in self.emoji_meta_data]
+
+        # TODO: return as tf.data.DataSet
         return images
 
-    def read_images_from_sheet(...):
+    def read_images_from_sheet(self):
         raise NotImplementedError
 
     def _read_single_image(self, image_base_path, image_name):
