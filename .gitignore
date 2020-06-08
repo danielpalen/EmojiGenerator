@@ -2,6 +2,8 @@
 *.idea
 *__pycache__
 
+# Ignore VSCode
+.vscode/
 
 # Images
 *.png
@@ -14,8 +16,9 @@
 *.giff
 
 # Ignore output ordner
-/output/
+output/
 
 
 # Ignore data ordner
-/data/
+data/
+emoji-data/
