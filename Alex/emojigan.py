@@ -27,6 +27,11 @@ import sys
     | `obsoletes`, `obsoleted_by` | Emoji that are no longer used, in preference of gendered versions. |
 
 """
+"""
+    Categories:
+    {'Travel & Places', 'Objects', 'Animals & Nature', 'Skin Tones', 'Activities', 
+    'Symbols', 'People & Body', 'Food & Drink', 'Flags', 'Smileys & Emotion'}
+"""
 
 data = read_json()
 emojis = []
@@ -43,15 +48,13 @@ pixel = 32
 
 # Remember this!!! This is how to read and write png preserving quality
 img = imageio.imread(im_path)
-img = np.asarray(img, dtype='float')
 imageio.imwrite(f'test.png', img)
-
-print(len(img))
 
 imgs = []
 
 for i in range(len(emojis)):
     em = emojis[i]
+    # assert em['category'] == f'Smileys & Emotion'
     x = em[f'sheet_x']
     y = em[f'sheet_y']
 
@@ -60,19 +63,19 @@ for i in range(len(emojis)):
 
     start_x = gaps_x + pixel * x
     start_y = gaps_y + pixel * y
-    imgs.append(img[start_x:start_x+pixel, start_y:start_y+pixel])
 
-imgs = np.asarray(imgs)
-print(imgs.shape)
-print(type(imgs))
-#imgs = imgs.astype('float32')
+    # Attention: x and y axis are changed
+    imgs.append(img[start_y:start_y+pixel, start_x:start_x+pixel])
 
-print(imgs[1])
-
-plt.imshow(imgs[1])
+plt.imshow(imgs[0])
+# plt.savefig(f'./images/emoji_{i}.png')
 plt.show()
 
-sys.exit()
+# ---------- PREPROCESSING ----------- #
+
+imgs = np.asarray(imgs)
+imgs = imgs.astype(float)
+imgs = (imgs - 127.5) / 127.5
 
 # ---------- CREATE MODELS ----------- #
 
@@ -100,8 +103,8 @@ def make_generator_model():
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
-    model.add(layers.Conv2DTranspose(1, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
-    assert model.output_shape == (None, 32, 32, 1)
+    model.add(layers.Conv2DTranspose(4, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
+    assert model.output_shape == (None, 32, 32, 4)
 
     return model
 
@@ -109,7 +112,7 @@ def make_generator_model():
 def make_discriminator_model():
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same',
-                                     input_shape=[32, 32, 1]))
+                            input_shape=[32, 32, 4]))
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
 
@@ -125,3 +128,9 @@ def make_discriminator_model():
 
 generator = make_generator_model()
 discriminator = make_discriminator_model()
+
+
+# ---------- TEST NETWORKS ----------- #
+
+noise = tf.random.normal([1, 100])
+generated_image = generator(noise, training=False)
