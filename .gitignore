@@ -1,0 +1,17 @@
+# Ignore PyCharm
+*.idea
+*__pycache__
+
+
+# Images
+*.png
+*.PNG
+*.JPG
+*.JPEG
+*.jpeg
+*.jpg
+*.gif
+*.giff
+
+# Ignore output ordner
+/output/
