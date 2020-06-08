@@ -15,3 +15,7 @@
 
 # Ignore output ordner
 /output/
+
+
+# Ignore data ordner
+/data/
