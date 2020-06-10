@@ -10,6 +10,25 @@ import tensorflow as tf
 
 from PIL import Image
 
+"""
+    | Fields | Description |
+    | ------ | ----------- |
+    | `name` | The offical Unicode name, in SHOUTY UPPERCASE. |
+    | `category` | The offical Unicode name, in SHOUTY UPPERCASE. |
+    | `unified` | The Unicode codepoint, as 4-5 hex digits. Where an emoji needs 2 or more codepoints, they are specified like 1F1EA-1F1F8. For emoji that need to specifiy a variation selector (-FE0F), that is included here. |
+    | `non_qualified` | For emoji that also have usage without a variation selector, that version is included here (otherwise is null). |
+    | `docomo`, `au`,<br>`softbank`, `google` | The legacy Unicode codepoints used by various mobile vendors. |
+    | `image` | The name of the image file. |
+    | `sheet_x`, `sheet_y` | The position of the image in the spritesheets. |
+    | `short_name` | The commonly-agreed upon short name for the image, as supported in campfire, github etc via the :colon-syntax: |
+    | `short_names` | An array of all the known short names. |
+    | `text` | An ASCII version of the emoji (e.g. `:)`), or null where none exists. |
+    | `texts` | An array of ASCII emoji that should convert into this emoji. Each ASCII emoji will only appear against a single emoji entry. |
+    | `has_img_*` | A flag for whether the given image set has an image (named by the image prop) available. |
+    | `added_id` | Emoji version in which this codepoint/sequence was added (previously Unicode version). |
+    | `skin_variations` | For emoji with multiple skin tone variations, a list of alternative glyphs, keyed by the skin tone. For emoji that support multiple skin tones within a single emoji, each skin tone is separated by a dash character. |
+    | `obsoletes`, `obsoleted_by` | Emoji that are no longer used, in preference of gendered versions. |
+"""
 
 class EmojiReader:
     """
@@ -18,22 +37,34 @@ class EmojiReader:
     into a folder 'emoji-data' that is at the same level as this file.
     """
 
-    def __init__(self, categories=None):
+    def __init__(self, databases, in_all_db=True, categories=None):
         """
         Create an emoji reader object that reads the meta data from
         emoji.json and selects certain entries.
+
+        :param databases: list of the databases we want to use
+            (must be in [apple, facebook, google, twitter])
+        :param in_all_db: boolean. determine if emoji shall only be
+            included if it is present in all db
         :param categories: list of emoji categories we want to include.
             Possible categories: {'Travel & Places', 'Objects',
             'Animals & Nature', 'Skin Tones', 'Activities', 'Symbols',
             'People & Body', 'Food & Drink', 'Flags', 'Smileys & Emotion'}
         """
 
+        assert all(db in [f'apple', f'facebook', f'google', f'twitter'] for db in databases)
+        self.databases = databases
+        self.images_as_np = None
+
+        # Remind user to preprocess images
+        self.applied_preprocessing = False
+
         # Load emoji meta data
         self.EMOJI_BASE_PATH = os.path.join('.', 'emoji-data')
         with open(os.path.join(self.EMOJI_BASE_PATH, 'emoji.json')) as f:
             self.FULL_META_DATA = json.load(f)
 
-        # Categories
+        # Categories: select fitting meta data
         if not categories:
             # If categories=None, we want all categories
             self.selected_meta_data = self.FULL_META_DATA
@@ -43,8 +74,22 @@ class EmojiReader:
                 if self.FULL_META_DATA[i][f'category'] in categories:
                     self.selected_meta_data.append(self.FULL_META_DATA[i])
 
+        # Only keep emoji that are present in all selected databases (if desired)
+        trashed = 0
+        if in_all_db:
+            _selected_meta_data = []
+            for i in range(len(self.selected_meta_data)):
+                if all(self.selected_meta_data[i][f'has_img_{_db}'] for _db in databases):
+                    _selected_meta_data.append(self.selected_meta_data[i])
+                else:
+                    trashed += 1
+            self.selected_meta_data = _selected_meta_data
+
         print(f'Image Reader created!')
-        print(f'{len(self.selected_meta_data)} meta data entries selected.')
+        print(f'- Databases: {databases}')
+        print(f'- Categories: {categories}')
+        print(f'- {trashed} entries deselected, because not in all sel databases') if in_all_db else ...
+        print(f'- {len(self.selected_meta_data)} meta data entries selected.\n')
 
     def read_images(self, filter=None):  # Filter could be a filter functino to select s
         # images = [{
@@ -80,24 +125,19 @@ class EmojiReader:
                 f'Error: Could not read image {os.path.join(image_base_path, image_name)}')
             return None
 
-    def read_images_from_sheet(self, pixel, databases, in_all_db=True, png_format=f'RGB', debugging=False):
+    def read_images_from_sheet(self, pixel, png_format=f'RGB', debugging=False):
         """
         This function reads emoji images by utilizing the sheets
         that contain all emojis in the git repository instead
         of importing the individual emoji images.
 
         :param pixel: size of each emoji. must be in {16, 20, 32, 64}.
-        :param databases: list of the databases we want to use
-            (must be in [apple, facebook, google, twitter])
-        :param in_all_db: boolean. determine if emoji shall only be
-            included if it is present in all db
         :param png_format: the format (RGB or RGBA) of the images
         :param debugging: boolean that determines if debugging is on.
         :return: list of numpy arrays
         """
 
         assert pixel in [16, 20, 32, 64]
-        assert all(db in [f'apple', f'facebook', f'google', f'twitter'] for db in databases)
         assert png_format in [f'RGB', f'RGBA']
 
         if debugging:
@@ -106,14 +146,14 @@ class EmojiReader:
         # Collect all emoji images
         images = []
 
-        for db in databases:
+        for db in self.databases:
             im_path = f'emoji-data/sheet_{db}_{pixel}.png'
             im = Image.open(im_path)
 
             # Convert to RGB if we don't want RGBA
             if png_format == f'RGB':
                 im.load()  # needed for split()
-                background = Image.new('RGB', im.size, (255, 255, 255))
+                background = Image.new(f'RGB', im.size, (255, 255, 255))
                 background.paste(im, mask=im.split()[3])  # 3 is the alpha channel
             else:
                 # Because the RGB values are random at places where
@@ -129,11 +169,6 @@ class EmojiReader:
                 # Check if emoji exists in this database
                 if not meta_data[f'has_img_{db}']:
                     continue
-
-                # If desired, check if present in all databases
-                elif in_all_db:
-                    if not all(meta_data[f'has_img_{_db}'] for _db in databases):
-                        continue
 
                 # Get the x. emoji in x direction
                 x = meta_data[f'sheet_x']
@@ -159,11 +194,54 @@ class EmojiReader:
                     plt.show()
                     plt.clf()
 
-        print(f'{len(images)} images extracted (img size = {pixel}, type = {png_format}, db = {databases}).')
+        print(f'{len(images)} images extracted from sheets')
+        print(f'- img size = {pixel}, type = {png_format}, db = {self.databases}.\n')
 
-        return images
+        self.images_as_np = np.asarray(images)
+
+        return True
+
+    def apply_preprocessing(self):
+        """
+        Convert self.images_as_np to float, make them fall around 0
+        and into [-1, 1].
+        :return: true if successful
+        """
+        images = self.images_as_np
+        images = np.asarray(images)
+        images = images.astype(float)
+        images = (images - 127.5) / 127.5
+
+        self.applied_preprocessing = True
+
+        print(f'Preprocessing:')
+        print(f'- {np.average(images, axis=(0, 1, 2))} should be around 0')
+        print(f'- {np.min(images, axis=(0, 1, 2))} should be around -1')
+        print(f'- {np.max(images, axis=(0, 1, 2))} should be around 1\n')
+
+        return True
+
+    def get_tf_dataset(self, batch_size):
+        """
+        Create a tensorflow dataset which is shuffled and divided
+        into batches. It uses the internal self.images_as_np variable.
+        Make sure each entry in images_as_np represents an image.
+
+        :param batch_size: the batch size that we wich
+        :return: a tensorflow Dataset
+        """
+        if not self.applied_preprocessing:
+            print(f'Warning: Data not yet preprocessed.')
+
+        buffer_size = 60000
+
+        # Batch and shuffle the data
+        tf_dataset = tf.data.Dataset.from_tensor_slices(self.images_as_np)
+        tf_dataset = tf_dataset.shuffle(buffer_size).batch(batch_size)
+
+        return tf_dataset
 
 
 if __name__ == '__main__':
-    reader = EmojiReader(categories=['Smileys & Emotion'])
-    reader.read_images_from_sheet(pixel=32, databases=[f'apple', f'twitter', f'facebook'])
+    reader = EmojiReader(databases=[f'apple', f'twitter', f'facebook'], categories=['Smileys & Emotion'])
+    reader.read_images_from_sheet(pixel=32)

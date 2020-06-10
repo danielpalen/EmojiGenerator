@@ -10,58 +10,16 @@ import os
 import time
 from PIL import Image
 from emoji_reader import EmojiReader
-"""
-    | Fields | Description |
-    | ------ | ----------- |
-    | `name` | The offical Unicode name, in SHOUTY UPPERCASE. |
-    | `category` | The offical Unicode name, in SHOUTY UPPERCASE. |
-    | `unified` | The Unicode codepoint, as 4-5 hex digits. Where an emoji needs 2 or more codepoints, they are specified like 1F1EA-1F1F8. For emoji that need to specifiy a variation selector (-FE0F), that is included here. |
-    | `non_qualified` | For emoji that also have usage without a variation selector, that version is included here (otherwise is null). |
-    | `docomo`, `au`,<br>`softbank`, `google` | The legacy Unicode codepoints used by various mobile vendors. |
-    | `image` | The name of the image file. |
-    | `sheet_x`, `sheet_y` | The position of the image in the spritesheets. |
-    | `short_name` | The commonly-agreed upon short name for the image, as supported in campfire, github etc via the :colon-syntax: |
-    | `short_names` | An array of all the known short names. |
-    | `text` | An ASCII version of the emoji (e.g. `:)`), or null where none exists. |
-    | `texts` | An array of ASCII emoji that should convert into this emoji. Each ASCII emoji will only appear against a single emoji entry. |
-    | `has_img_*` | A flag for whether the given image set has an image (named by the image prop) available. |
-    | `added_id` | Emoji version in which this codepoint/sequence was added (previously Unicode version). |
-    | `skin_variations` | For emoji with multiple skin tone variations, a list of alternative glyphs, keyed by the skin tone. For emoji that support multiple skin tones within a single emoji, each skin tone is separated by a dash character. |
-    | `obsoletes`, `obsoleted_by` | Emoji that are no longer used, in preference of gendered versions. |
-
-"""
-"""
-    Categories:
-    {'Travel & Places', 'Objects', 'Animals & Nature', 'Skin Tones', 'Activities', 
-    'Symbols', 'People & Body', 'Food & Drink', 'Flags', 'Smileys & Emotion'}
-"""
-
-reader = EmojiReader(categories=['Smileys & Emotion'])
-emojis = reader.selected_meta_data
-
-
-
-# ---------- PREPROCESSING ----------- #
-
-# Alpha channel has range [0, 255]
-
-imgs = np.asarray(imgs)
-imgs = imgs.astype(float)
-imgs = (imgs - 127.5) / 127.5
-print(f'{np.average(imgs, axis=(0, 1, 2))} should be around 0')
-print(f'{np.min(imgs, axis=(0, 1, 2))} should be around -1')
-print(f'{np.max(imgs, axis=(0, 1, 2))} should be around 1')
-
 
 # ---------- CREATE DATASET ----------- #
+reader = EmojiReader(databases=[f'apple'], categories=['Smileys & Emotion'])
+reader.read_images_from_sheet(pixel=32)
+reader.apply_preprocessing()
 
-BUFFER_SIZE = 60000
-BATCH_SIZE = 32
 
-# Batch and shuffle the data
-train_dataset = tf.data.Dataset.from_tensor_slices(imgs).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 
-print(train_dataset.element_spec)
+
+
 
 # ---------- CREATE MODELS ----------- #
 
