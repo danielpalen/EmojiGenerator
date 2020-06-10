@@ -24,17 +24,24 @@ class EmojiReader:
             'Animals & Nature', 'Skin Tones', 'Activities', 'Symbols',
             'People & Body', 'Food & Drink', 'Flags', 'Smileys & Emotion'}
         """
+
         # Load emoji meta data
-        self.emojis_base_path = os.path.join('.', 'emoji-data')
-        with open(os.path.join(self.emojis_base_path, 'emoji.json')) as f:
-            self.emoji_meta_data = json.load(f)
+        self.EMOJI_BASE_PATH = os.path.join('.', 'emoji-data')
+        with open(os.path.join(self.EMOJI_BASE_PATH, 'emoji.json')) as f:
+            self.FULL_META_DATA = json.load(f)
 
         # Categories
         if not categories:
-            pass # If empty, keep all categories
+            # If empty, we want all categories
+            self.selected_meta_data = self.FULL_META_DATA
         else:
-            self.emoji_meta_data
+            self.selected_meta_data = []
+            for i in range(len(self.FULL_META_DATA)):
+                if self.FULL_META_DATA[i][f'category'] in categories:
+                    self.selected_meta_data.append(self.FULL_META_DATA[i])
 
+        for i in range(len(self.selected_meta_data)):
+            print(self.selected_meta_data[i]['category'])
 
     def read_images(self, filter=None):  # Filter could be a filter functino to select s
         # images = [{
@@ -46,8 +53,8 @@ class EmojiReader:
 
         images = [
             self._read_single_image(os.path.join(
-                self.emojis_base_path, 'img-apple-64'), d['image'])
-            for d in self.emoji_meta_data
+                self.EMOJI_BASE_PATH, 'img-apple-64'), d['image'])
+            for d in self.selected_meta_data
         ]
         images = [i for i in images if i is not None]
         images = np.stack(images, axis=0).astype('float32')
@@ -59,7 +66,7 @@ class EmojiReader:
 
     def _read_single_image(self, image_base_path, image_name):
         """Read emoji image and return as np array"""
-        # TODO: is there a more allegant way to do this?
+        # TODO: is there a more elegant way to do this?
         try:
             image_path = os.path.join(image_base_path, image_name)
             image_data = imageio.imread(image_path)
@@ -75,6 +82,4 @@ class EmojiReader:
 
 
 if __name__ == '__main__':
-    reader = EmojiReader()
-    images = reader.read_images()
-    print()
+    reader = EmojiReader(categories=['Smileys & Emotion'])
