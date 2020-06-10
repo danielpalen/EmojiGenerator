@@ -8,6 +8,7 @@ import tensorflow as tf
 import sys
 import os
 import time
+from PIL import Image
 
 """
     | Fields | Description |
@@ -50,11 +51,12 @@ pixel = 32
 
 # Remember this!!! This is how to read and write png preserving quality
 img = imageio.imread(im_path)
+img = np.asarray(img)
 imageio.imwrite(f'test.png', img)
 
 imgs = []
 
-for i in range(len(emojis)):
+for i in range(38, 44):
     em = emojis[i]
     x = em[f'sheet_x']
     y = em[f'sheet_y']
@@ -66,12 +68,25 @@ for i in range(len(emojis)):
     start_y = gaps_y + pixel * y
 
     # Attention: x and y axis are changed
-    imgs.append(img[start_y:start_y+pixel, start_x:start_x+pixel])
+    im = img[start_y:start_y+pixel, start_x:start_x+pixel]
 
-    plt.imshow(img[start_y:start_y+pixel, start_x:start_x+pixel])
+    # KEEP RGBA
+    # Fill white everywhere alpha == 0
+    # im[im[:, :, 3] == 0] = [255, 255, 255, 0]
+
+    # WORK WITH RGB
+    im = Image.fromarray(im)
+    im.load()  # needed for split()
+    background = Image.new('RGB', im.size, (255, 255, 255))
+    background.paste(im, mask=im.split()[3])  # 3 is the alpha channel
+    im = np.asarray(background)
+
+    imgs.append(im)
+    plt.imshow(im)
     plt.savefig(f'./images/emoji_{i}.png')
+    plt.show()
     plt.clf()
-plt.show()
+    # print(im)
 
 # ---------- PREPROCESSING ----------- #
 
@@ -88,7 +103,7 @@ print(f'{np.max(imgs, axis=(0, 1, 2))} should be around 1')
 # ---------- CREATE DATASET ----------- #
 
 BUFFER_SIZE = 60000
-BATCH_SIZE = 256
+BATCH_SIZE = 32
 
 # Batch and shuffle the data
 train_dataset = tf.data.Dataset.from_tensor_slices(imgs).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
@@ -105,7 +120,7 @@ def make_generator_model():
     LeakyReLU activation, except last layer
     """
     model = tf.keras.Sequential()
-    model.add(layers.Dense(8*8*1024, use_bias=False, input_shape=(400,)))
+    model.add(layers.Dense(8*8*1024, use_bias=False, input_shape=(10,)))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
@@ -132,8 +147,8 @@ def make_generator_model():
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
-    model.add(layers.Conv2DTranspose(4, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
-    assert model.output_shape == (None, 32, 32, 4)
+    model.add(layers.Conv2DTranspose(3, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
+    assert model.output_shape == (None, 32, 32, 3)
 
     return model
 
@@ -141,7 +156,7 @@ def make_generator_model():
 def make_discriminator_model():
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same',
-                            input_shape=[32, 32, 4]))
+                            input_shape=[32, 32, 3]))
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
 
@@ -202,7 +217,7 @@ checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
 # checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
 EPOCHS = 1000
-noise_dim = 400
+noise_dim = 10
 num_examples_to_generate = 16
 
 # We will reuse this seed overtime (so it's easier
@@ -217,19 +232,20 @@ def train_step(images):
     noise = tf.random.normal([BATCH_SIZE, noise_dim])
 
     with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
-      generated_images = generator(noise, training=True)
+        generated_images = generator(noise, training=True)
 
-      real_output = discriminator(images, training=True)
-      fake_output = discriminator(generated_images, training=True)
+        real_output = discriminator(images, training=True)
+        fake_output = discriminator(generated_images, training=True)
 
-      gen_loss = generator_loss(fake_output)
-      disc_loss = discriminator_loss(real_output, fake_output)
+        gen_loss = generator_loss(fake_output)
+        disc_loss = discriminator_loss(real_output, fake_output)
 
     gradients_of_generator = gen_tape.gradient(gen_loss, generator.trainable_variables)
     gradients_of_discriminator = disc_tape.gradient(disc_loss, discriminator.trainable_variables)
 
     generator_optimizer.apply_gradients(zip(gradients_of_generator, generator.trainable_variables))
     discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, discriminator.trainable_variables))
+
 
 def train(dataset, epochs):
   for epoch in range(epochs):
