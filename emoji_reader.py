@@ -98,53 +98,58 @@ class EmojiReader:
         assert all(db in [f'apple', f'facebook', f'google', f'twitter'] for db in databases)
         assert type in [f'RGB', f'RGBA']
 
+        if debugging:
+            os.mkdir(f'output/selected_emoji/')
+
+        # Collect all emoji images
+        images = []
+
         for db in databases:
             im_path = f'emoji-data/sheet_{db}_{pixel}.png'
-            img = Image.open(im_path)
+            im = Image.open(im_path)
 
             # Convert to RGB if we don't want RGBA
             if type == f'RGB':
                 im.load()  # needed for split()
                 background = Image.new('RGB', im.size, (255, 255, 255))
                 background.paste(im, mask=im.split()[3])  # 3 is the alpha channel
-                im = np.asarray(background)
+            else:
+                # Because the RGB values are random at places where
+                # alpha == 0, we set it manually to white
+                im[im[:, :, 3] == 0] = [255, 255, 255, 0]
 
-            print(np.asarray(img).shape)
+            im.show() if debugging else ...  # debug: show sheet
 
-            img.show() if debugging else ...  # debug: show sheet
-
-            print(img.shape)
-            sys.exit(9)
-            images = []
+            im = np.asarray(im)
 
             for i in range(len(self.selected_meta_data)):
-                em = self.selected_meta_data[i]
-                x = em[f'sheet_x']
-                y = em[f'sheet_y']
+                meta_data = self.selected_meta_data[i]
 
+                # The x. image in x direction
+                x = meta_data[f'sheet_x']
+                y = meta_data[f'sheet_y']
+
+                # Calculate the empty rows in front of this emoji
                 gaps_x = 1 + x * 2
                 gaps_y = 1 + y * 2
 
+                # Calculate the top left corner of this emoji
                 start_x = gaps_x + pixel * x
                 start_y = gaps_y + pixel * y
 
+                # Extract emoji
                 # Attention: x and y axis are changed
-                im = img[start_y:start_y + pixel, start_x:start_x + pixel]
+                emoji_im = im[start_y:start_y + pixel, start_x:start_x + pixel]
 
-                # KEEP RGBA
-                # Fill white everywhere alpha == 0
-                # im[im[:, :, 3] == 0] = [255, 255, 255, 0]
+                images.append(emoji_im)
 
-                # WORK WITH RGB
-                im = Image.fromarray(im)
-
-
-                images.append(im)
                 if debugging:
-                    plt.imshow(im)
-                    plt.savefig(f'output/selected_emojis/emoji_{i}.png')
+                    plt.imshow(emoji_im)
+                    plt.savefig(f'output/selected_emoji/emoji_{i}.png')
                     plt.show()
                     plt.clf()
+
+        return images
 
 
 if __name__ == '__main__':
