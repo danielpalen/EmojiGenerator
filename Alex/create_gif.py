@@ -2,10 +2,10 @@
 import glob
 import imageio
 
-anim_file = 'dcgan.gif'
+anim_file = 'emojigan.gif'
 
 with imageio.get_writer(anim_file, mode='I') as writer:
-  filenames = glob.glob('./images/image*.png')
+  filenames = glob.glob('output/images/image*.png')
   filenames = sorted(filenames)
   last = -1
   for i,filename in enumerate(filenames):

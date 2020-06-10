@@ -1,5 +1,4 @@
 
-from Alex.read_json import read_json
 import matplotlib.pyplot as plt
 import imageio
 import numpy as np
@@ -10,19 +9,26 @@ import os
 import time
 from PIL import Image
 from emoji_reader import EmojiReader
+from utilities import constants
+import shutil
+
+# ---------- HYPERPARAMETERS ---------- #
+
+NOISE_DIM = 10
+EPOCHS = 1000
+BATCH_SIZE = 32
+EXAMPLES_TO_GENERATE = 16
+RESTORE_CHECKPOINT = False
 
 # ---------- CREATE DATASET ----------- #
-reader = EmojiReader(databases=[f'apple'], categories=['Smileys & Emotion'])
-reader.read_images_from_sheet(pixel=32)
+
+reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_SMILING_EMOJIS)
+reader.read_images_from_sheet(pixel=32, debugging=True)
 reader.apply_preprocessing()
 
-
-
-
-
+train_dataset = reader.get_tf_dataset(batch_size=BATCH_SIZE)
 
 # ---------- CREATE MODELS ----------- #
-
 
 def make_generator_model():
     """
@@ -115,8 +121,9 @@ discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
 # ---------------- SAVE CHECKPOINTS --------------- #
 
-
-checkpoint_dir = '../output/training_checkpoints'
+if not os.path.exists(f'output/training_checkpoints/'):
+    os.mkdir(f'output/training_checkpoints/')
+checkpoint_dir = 'output/training_checkpoints'
 checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
 checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
                                  discriminator_optimizer=discriminator_optimizer,
@@ -125,22 +132,22 @@ checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
 
 # ------------------ TRAINING LOOP ---------------- #
 
-# checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
+if RESTORE_CHECKPOINT:
+    checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
-EPOCHS = 1000
-noise_dim = 10
-num_examples_to_generate = 16
+if not os.path.exists(f'output/images'):
+    os.mkdir(f'output/images/')
 
 # We will reuse this seed overtime (so it's easier
 # to visualize progress in the animated GIF)
-seed = tf.random.normal([num_examples_to_generate, noise_dim])
+seed = tf.random.normal([EXAMPLES_TO_GENERATE, NOISE_DIM])
 
 
 # Notice the use of `tf.function`
 # This annotation causes the function to be "compiled".
 @tf.function
 def train_step(images):
-    noise = tf.random.normal([BATCH_SIZE, noise_dim])
+    noise = tf.random.normal([BATCH_SIZE, NOISE_DIM])
 
     with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
         generated_images = generator(noise, training=True)
@@ -192,7 +199,7 @@ def generate_and_save_images(model, epoch, test_input):
       plt.imshow(im)
       plt.axis('off')
 
-  plt.savefig('./images/image_at_epoch_{:04d}.png'.format(epoch))
+  plt.savefig('output/images/image_at_epoch_{:04d}.png'.format(epoch))
   plt.show()
 
 

@@ -9,6 +9,8 @@ import numpy as np
 import tensorflow as tf
 
 from PIL import Image
+import shutil
+
 
 """
     | Fields | Description |
@@ -37,7 +39,7 @@ class EmojiReader:
     into a folder 'emoji-data' that is at the same level as this file.
     """
 
-    def __init__(self, databases, in_all_db=True, categories=None):
+    def __init__(self, databases, in_all_db=True, categories=None, emoji_names=None):
         """
         Create an emoji reader object that reads the meta data from
         emoji.json and selects certain entries.
@@ -49,7 +51,10 @@ class EmojiReader:
         :param categories: list of emoji categories we want to include.
             Possible categories: {'Travel & Places', 'Objects',
             'Animals & Nature', 'Skin Tones', 'Activities', 'Symbols',
-            'People & Body', 'Food & Drink', 'Flags', 'Smileys & Emotion'}
+            'People & Body', 'Food & Drink', 'Flags', 'Smileys & Emotion'}.
+            If 'None' all categories are included
+        :param emoji_names: a list of the unicode emoji names we want to
+            include. If 'None', all emoji are included.
         """
 
         assert all(db in [f'apple', f'facebook', f'google', f'twitter'] for db in databases)
@@ -64,15 +69,24 @@ class EmojiReader:
         with open(os.path.join(self.EMOJI_BASE_PATH, 'emoji.json')) as f:
             self.FULL_META_DATA = json.load(f)
 
-        # Categories: select fitting meta data
-        if not categories:
-            # If categories=None, we want all categories
-            self.selected_meta_data = self.FULL_META_DATA
-        else:
+        # Select emoji by name
+        if emoji_names:
             self.selected_meta_data = []
             for i in range(len(self.FULL_META_DATA)):
-                if self.FULL_META_DATA[i][f'category'] in categories:
+                name = self.FULL_META_DATA[i][f'name']
+                # Some have no name, so skip all with 'None'
+                if name and name.lower() in emoji_names:
                     self.selected_meta_data.append(self.FULL_META_DATA[i])
+        else:
+            self.selected_meta_data = self.FULL_META_DATA
+
+        # Select emoji by category
+        if categories:
+            _selected_meta_data = []
+            for i in range(len(self.selected_meta_data)):
+                if self.selected_meta_data[i][f'category'] in categories:
+                    _selected_meta_data.append(self.selected_meta_data[i])
+            self.selected_meta_data = _selected_meta_data
 
         # Only keep emoji that are present in all selected databases (if desired)
         trashed = 0
@@ -141,6 +155,7 @@ class EmojiReader:
         assert png_format in [f'RGB', f'RGBA']
 
         if debugging:
+            shutil.rmtree('output/selected_emoji/')
             os.mkdir(f'output/selected_emoji/')
 
         # Collect all emoji images
@@ -155,6 +170,7 @@ class EmojiReader:
                 im.load()  # needed for split()
                 background = Image.new(f'RGB', im.size, (255, 255, 255))
                 background.paste(im, mask=im.split()[3])  # 3 is the alpha channel
+                im = background
             else:
                 # Because the RGB values are random at places where
                 # alpha == 0, we set it manually to white
@@ -231,7 +247,7 @@ class EmojiReader:
         :return: a tensorflow Dataset
         """
         if not self.applied_preprocessing:
-            print(f'Warning: Data not yet preprocessed.')
+            print(f'\x1b[1;31;43mWarning: Data not yet preprocessed.\x1b[0m\n')
 
         buffer_size = 60000
 
