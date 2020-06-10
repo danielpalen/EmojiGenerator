@@ -9,7 +9,7 @@ import sys
 import os
 import time
 from PIL import Image
-
+from emoji_reader import EmojiReader
 """
     | Fields | Description |
     | ------ | ----------- |
@@ -36,57 +36,10 @@ from PIL import Image
     'Symbols', 'People & Body', 'Food & Drink', 'Flags', 'Smileys & Emotion'}
 """
 
-data = read_json()
-emojis = []
+reader = EmojiReader(categories=['Smileys & Emotion'])
+emojis = reader.selected_meta_data
 
-# Extract only smileys and emotions
-for i in range(len(data)):
-    if data[i][f'category'] == f'Smileys & Emotion':
-        emojis.append(data[i])
 
-# ---------- Extracting the images ----------- #
-
-im_path = f'../emoji-data/sheet_apple_32.png'
-pixel = 32
-
-# Remember this!!! This is how to read and write png preserving quality
-img = imageio.imread(im_path)
-img = np.asarray(img)
-imageio.imwrite(f'test.png', img)
-
-imgs = []
-
-for i in range(38, 44):
-    em = emojis[i]
-    x = em[f'sheet_x']
-    y = em[f'sheet_y']
-
-    gaps_x = 1 + x*2
-    gaps_y = 1 + y*2
-
-    start_x = gaps_x + pixel * x
-    start_y = gaps_y + pixel * y
-
-    # Attention: x and y axis are changed
-    im = img[start_y:start_y+pixel, start_x:start_x+pixel]
-
-    # KEEP RGBA
-    # Fill white everywhere alpha == 0
-    # im[im[:, :, 3] == 0] = [255, 255, 255, 0]
-
-    # WORK WITH RGB
-    im = Image.fromarray(im)
-    im.load()  # needed for split()
-    background = Image.new('RGB', im.size, (255, 255, 255))
-    background.paste(im, mask=im.split()[3])  # 3 is the alpha channel
-    im = np.asarray(background)
-
-    imgs.append(im)
-    plt.imshow(im)
-    plt.savefig(f'./images/emoji_{i}.png')
-    plt.show()
-    plt.clf()
-    # print(im)
 
 # ---------- PREPROCESSING ----------- #
 
