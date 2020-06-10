@@ -10,6 +10,7 @@ import tensorflow as tf
 
 from PIL import Image
 
+
 class EmojiReader:
     """
     This class reads emojis from the https://github.com/iamcal/emoji-data
@@ -42,6 +43,7 @@ class EmojiReader:
                 if self.FULL_META_DATA[i][f'category'] in categories:
                     self.selected_meta_data.append(self.FULL_META_DATA[i])
 
+        print(f'Image Reader created!')
         print(f'{len(self.selected_meta_data)} meta data entries selected.')
 
     def read_images(self, filter=None):  # Filter could be a filter functino to select s
@@ -78,25 +80,25 @@ class EmojiReader:
                 f'Error: Could not read image {os.path.join(image_base_path, image_name)}')
             return None
 
-    def read_images_from_sheet(self, pixel, databases, type, debugging=False):
+    def read_images_from_sheet(self, pixel, databases, in_all_db=True, png_format=f'RGB', debugging=False):
         """
-        This function does not import each image individually, but utilizes
-        the sheets that contain all emojis in the git repository. It reads one
-        sheet (specified by pixel size and color depth) for every database
-        (apple, facebook, google or twitter) specified and extracts each emoji
-        from these sheet.
+        This function reads emoji images by utilizing the sheets
+        that contain all emojis in the git repository instead
+        of importing the individual emoji images.
 
         :param pixel: size of each emoji. must be in {16, 20, 32, 64}.
         :param databases: list of the databases we want to use
             (must be in [apple, facebook, google, twitter])
-        :param type: the format (RGB or RGBA) of the images
+        :param in_all_db: boolean. determine if emoji shall only be
+            included if it is present in all db
+        :param png_format: the format (RGB or RGBA) of the images
         :param debugging: boolean that determines if debugging is on.
         :return: list of numpy arrays
         """
 
         assert pixel in [16, 20, 32, 64]
         assert all(db in [f'apple', f'facebook', f'google', f'twitter'] for db in databases)
-        assert type in [f'RGB', f'RGBA']
+        assert png_format in [f'RGB', f'RGBA']
 
         if debugging:
             os.mkdir(f'output/selected_emoji/')
@@ -109,7 +111,7 @@ class EmojiReader:
             im = Image.open(im_path)
 
             # Convert to RGB if we don't want RGBA
-            if type == f'RGB':
+            if png_format == f'RGB':
                 im.load()  # needed for split()
                 background = Image.new('RGB', im.size, (255, 255, 255))
                 background.paste(im, mask=im.split()[3])  # 3 is the alpha channel
@@ -119,13 +121,21 @@ class EmojiReader:
                 im[im[:, :, 3] == 0] = [255, 255, 255, 0]
 
             im.show() if debugging else ...  # debug: show sheet
-
             im = np.asarray(im)
 
             for i in range(len(self.selected_meta_data)):
                 meta_data = self.selected_meta_data[i]
 
-                # The x. image in x direction
+                # Check if emoji exists in this database
+                if not meta_data[f'has_img_{db}']:
+                    continue
+
+                # If desired, check if present in all databases
+                elif in_all_db:
+                    if not all(meta_data[f'has_img_{_db}'] for _db in databases):
+                        continue
+
+                # Get the x. emoji in x direction
                 x = meta_data[f'sheet_x']
                 y = meta_data[f'sheet_y']
 
@@ -149,9 +159,11 @@ class EmojiReader:
                     plt.show()
                     plt.clf()
 
+        print(f'{len(images)} images extracted (img size = {pixel}, type = {png_format}, db = {databases}).')
+
         return images
 
 
 if __name__ == '__main__':
     reader = EmojiReader(categories=['Smileys & Emotion'])
-    reader.read_images_from_sheet(pixel=32, databases=[f'apple'], type=f'RGB', debugging=True)
+    reader.read_images_from_sheet(pixel=32, databases=[f'apple', f'twitter', f'facebook'])
