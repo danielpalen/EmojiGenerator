@@ -163,7 +163,6 @@ class EmojiReader:
                 im = background
 
             im.show() if debugging else ...  # debug: show sheet
-            sys.exit()
             im = np.asarray(im)
 
             for i in range(len(self.selected_meta_data)):

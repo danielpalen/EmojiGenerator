@@ -7,13 +7,13 @@ from utilities import constants
 # ---------- HYPERPARAMETERS ---------- #
 
 NOISE_DIM = 100
-EPOCHS = 1000
+EPOCHS = 2000
 BATCH_SIZE = 256
 
 # ---------- CREATE DATASET ----------- #
 
 reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_SMILING_EMOJIS)
-reader.read_images_from_sheet(pixel=32, debugging=True, png_format='RGB')
+reader.read_images_from_sheet(pixel=32, debugging=False, png_format='RGB')
 reader.apply_preprocessing()
 print(reader.images_as_np.shape)
 
