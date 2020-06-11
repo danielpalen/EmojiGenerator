@@ -162,7 +162,6 @@ class EmojiReader:
                 im[im[:, :, 3] == 0] = [255, 255, 255, 0]
                 im = Image.fromarray(im)
 
-
             im.show() if debugging else ...  # debug: show sheet
             im = np.asarray(im)
 
@@ -200,7 +199,7 @@ class EmojiReader:
         print(f'{len(images)} images extracted from sheets')
         print(f'- img size = {pixel}, type = {png_format}, db = {self.databases}.\n')
 
-        self.images_as_np = np.asarray(images)
+        self.images_as_np = np.asarray(images, dtype=np.float32)
 
         return True
 
@@ -212,8 +211,7 @@ class EmojiReader:
         :return: true if successful
         """
         images = self.images_as_np
-        images = np.asarray(images)
-        images = images.astype(np.float32)
+        images = np.asarray(images, np.float32)
         images = (images - 127.5) / 127.5
         self.images_as_np = images
 
