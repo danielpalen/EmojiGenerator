@@ -10,7 +10,8 @@ class EmojiGan:
     This class simplifies the creation of a generative
     adversarial network to learn generating emoji.
     """
-    def __init__(self, batch_size, noise_dim, restore_ckpt=False, examples=16):
+    def __init__(self, batch_size, noise_dim, gen_lr=1e-4,
+                 dis_lr=1e-4, restore_ckpt=False, examples=16):
         self.BATCH_SIZE = batch_size
         self.NOISE_DIM = noise_dim
         self.RESTORE_CKPT = restore_ckpt
@@ -21,23 +22,13 @@ class EmojiGan:
 
         self.cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
-        self.generator_optimizer = tf.keras.optimizers.Adam(1e-4)
-        self.discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
+        self.generator_optimizer = tf.keras.optimizers.Adam(gen_lr)
+        self.discriminator_optimizer = tf.keras.optimizers.Adam(dis_lr)
 
         # ----- EXAMPLES ----- #
         # We reuse the same seed over time
         # -> Easier to visualize progress
         self.SEED = tf.random.normal([self.EXAMPLES, self.NOISE_DIM])
-
-        # ----- CHECKPOINTS ----- #
-        if not os.path.exists(f'output/checkpoints/'):
-            os.mkdir(f'output/checkpoints/')
-        self.checkpoint_prefix = f'output/checkpoints/ckpt'
-        self.checkpoint = tf.train.Checkpoint(
-            generator_optimizer=self.generator_optimizer,
-            discriminator_optimizer=self.discriminator_optimizer,
-            generator=self.generator,
-            discriminator=self.discriminator)
 
         # ----- OUTPUT ----- #
         if not os.path.exists(f'output/images'):
@@ -75,6 +66,26 @@ class EmojiGan:
 
     def train(self, dataset, epochs):
 
+        # ----- Networks set? ----- #
+        if not self.generator or not self.discriminator:
+            raise RuntimeError(
+                f'The generator and discriminator have to be set before training.'
+            )
+
+        # ----- CKPT CONFIG ----- #
+        if not os.path.exists(f'output/checkpoints/'):
+            os.mkdir(f'output/checkpoints/')
+        checkpoint_dir = 'output/training_checkpoints'
+        checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
+        checkpoint = tf.train.Checkpoint(
+            generator_optimizer=self.generator_optimizer,
+            discriminator_optimizer=self.discriminator_optimizer,
+            generator=self.generator,
+            discriminator=self.discriminator)
+
+        if self.RESTORE_CKPT:
+            checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
+
         for epoch in range(epochs):
             start = time.time()
 
@@ -86,7 +97,7 @@ class EmojiGan:
 
             # Save the model every 15 epochs
             if (epoch + 1) % 15 == 0:
-              self.checkpoint.save(file_prefix=self.checkpoint_prefix)
+              checkpoint.save(file_prefix=checkpoint_prefix)
 
             print('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
 
@@ -96,7 +107,7 @@ class EmojiGan:
         print(f'TRAINING FINISHED')
 
     @staticmethod
-    def generate_and_save_images(self, model, epoch, test_input):
+    def generate_and_save_images(model, epoch, test_input):
         # 'Training' = False, so net runs in inference mode (batchnorm)
         predictions = model(test_input, training=False)
 
