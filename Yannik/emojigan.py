@@ -22,7 +22,7 @@ RESTORE_CHECKPOINT = False
 # ---------- CREATE DATASET ----------- #
 
 reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_SMILING_EMOJIS)
-reader.read_images_from_sheet(pixel=32, debugging=True)
+reader.read_images_from_sheet(pixel=32, debugging=False)
 reader.apply_preprocessing()
 
 train_dataset = reader.get_tf_dataset(batch_size=BATCH_SIZE)
@@ -119,7 +119,8 @@ generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
 # ---------------- SAVE CHECKPOINTS --------------- #
-
+if not os.path.exists(f'output/'):
+    os.mkdir(f'output/')
 if not os.path.exists(f'output/training_checkpoints/'):
     os.mkdir(f'output/training_checkpoints/')
 checkpoint_dir = 'output/training_checkpoints'
