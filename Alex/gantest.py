@@ -1,5 +1,5 @@
 import sys
-from emojinet import EmojiGan
+from emojigan import EmojiGan
 import models
 from emoji_reader import EmojiReader
 from utilities import constants
