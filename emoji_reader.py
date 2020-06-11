@@ -157,7 +157,11 @@ class EmojiReader:
             else:
                 # Because the RGB values are random at places where
                 # alpha == 0, we set it manually to white
+                im = np.asarray(im)
+                im.setflags(write=True)
                 im[im[:, :, 3] == 0] = [255, 255, 255, 0]
+                im = Image.fromarray(im)
+
 
             im.show() if debugging else ...  # debug: show sheet
             im = np.asarray(im)

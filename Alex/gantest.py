@@ -13,7 +13,7 @@ BATCH_SIZE = 256
 # ---------- CREATE DATASET ----------- #
 
 reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_SMILING_EMOJIS)
-reader.read_images_from_sheet(pixel=32, debugging=False)
+reader.read_images_from_sheet(pixel=32, debugging=True, png_format='RGBA')
 reader.apply_preprocessing()
 print(reader.images_as_np.shape)
 
@@ -27,10 +27,10 @@ emg = EmojiGan(
 )
 emg.generator = models.std_generator_model(
     noise_dim=100, start_shape=[8, 8, 256],
-    my_layers=[[128, 5, 1], [64, 5, 2], [3, 5, 2]]
+    my_layers=[[128, 5, 1], [64, 5, 2], [4, 5, 2]]
 )
 emg.discriminator = models.std_discriminator_model(
-    input_shape=[32, 32, 3], my_layers=[[64, 5, 2, 0.3], [128, 5, 2, 0.3]]
+    input_shape=[32, 32, 4], my_layers=[[64, 5, 2, 0.3], [128, 5, 2, 0.3]]
 )
 
 # ---------- TRAINING ----------- #
