@@ -8,7 +8,7 @@ from utilities import constants
 
 NOISE_DIM = 100
 EPOCHS = 1000
-BATCH_SIZE = 32
+BATCH_SIZE = 256
 
 # ---------- CREATE DATASET ----------- #
 

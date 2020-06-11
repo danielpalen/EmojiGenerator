@@ -37,9 +37,8 @@ def std_generator_model(noise_dim, start_shape, my_layers):
             model.add(layers.BatchNormalization())
             model.add(layers.LeakyReLU())
 
-    # TODO: Print structure of the model with tf function
-
-    print(model.output_shape)
+    print(f'GENERATOR NETWORK MODEL')
+    print(model.summary())
 
     return model
 
@@ -75,6 +74,7 @@ def std_discriminator_model(input_shape=None, my_layers=None, std_dropout=0.3):
     model.add(layers.Flatten())
     model.add(layers.Dense(1))
 
-    # TODO: Print structure of the model with tf function
+    print(f'DISCRIMINATOR NETWORK MODEL')
+    print(model.summary())
 
     return model
