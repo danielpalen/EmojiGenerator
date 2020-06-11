@@ -31,4 +31,4 @@ def create_gif(glob_img_path, gif_path):
 
 
 if __name__ == '__main__':
-    create_gif(f'output/images/image*.png', f'output/emojigan.gif')
+    create_gif(f'output/images/image*.png', f'../output/emojigan.gif')

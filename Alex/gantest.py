@@ -13,7 +13,7 @@ BATCH_SIZE = 256
 # ---------- CREATE DATASET ----------- #
 
 reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_SMILING_EMOJIS)
-reader.read_images_from_sheet(pixel=32, debugging=True, png_format='RGBA')
+reader.read_images_from_sheet(pixel=32, debugging=False, png_format='RGBA')
 reader.apply_preprocessing()
 print(reader.images_as_np.shape)
 

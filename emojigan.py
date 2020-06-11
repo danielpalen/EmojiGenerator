@@ -1,10 +1,13 @@
+import sys
 import os
 import time
 
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import numpy as np
 
-import gif
+from utilities import gif
+
 
 class EmojiGan:
     """
@@ -67,11 +70,13 @@ class EmojiGan:
 
     def train(self, dataset, epochs):
 
-        # ----- Networks set? ----- #
+        # ----- CHECKS ----- #
+        # Generator and discirminator have been set
         if not self.generator or not self.discriminator:
-            raise RuntimeError(
-                f'The generator and discriminator have to be set before training.'
-            )
+            raise RuntimeError(f'The generator and discriminator have to be set before training.')
+
+        # TODO: check if dataset has tf.float32 datatype
+        # raise TypeError(f'Please convert dataset to float before preprocessing.')
 
         # ----- CKPT CONFIG ----- #
         if not os.path.exists(f'output/checkpoints/'):
