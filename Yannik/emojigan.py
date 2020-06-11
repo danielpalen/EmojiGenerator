@@ -1,4 +1,3 @@
-
 import matplotlib.pyplot as plt
 import imageio
 import numpy as np
@@ -28,6 +27,7 @@ reader.apply_preprocessing()
 
 train_dataset = reader.get_tf_dataset(batch_size=BATCH_SIZE)
 
+
 # ---------- CREATE MODELS ----------- #
 
 def make_generator_model():
@@ -37,12 +37,12 @@ def make_generator_model():
     LeakyReLU activation, except last layer
     """
     model = tf.keras.Sequential()
-    model.add(layers.Dense(8*8*1024, use_bias=False, input_shape=(10,)))
+    model.add(layers.Dense(8 * 8 * 1024, use_bias=False, input_shape=(10,)))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
     model.add(layers.Reshape((8, 8, 1024)))
-    assert model.output_shape == (None, 8, 8, 1024) # Note: None is the batch size
+    assert model.output_shape == (None, 8, 8, 1024)  # Note: None is the batch size
 
     model.add(layers.Conv2DTranspose(521, (5, 5), strides=(1, 1), padding='same', use_bias=False))
     assert model.output_shape == (None, 8, 8, 521)
@@ -97,7 +97,6 @@ def make_discriminator_model():
 
 generator = make_generator_model()
 discriminator = make_discriminator_model()
-
 
 # ---------------- LOSS AND OPTIMIZERS --------------- #
 
@@ -166,41 +165,42 @@ def train_step(images):
 
 
 def train(dataset, epochs):
-  for epoch in range(epochs):
-    start = time.time()
+    for epoch in range(epochs):
+        start = time.time()
 
-    for image_batch in dataset:
-      train_step(image_batch)
+        for image_batch in dataset:
+            train_step(image_batch)
 
-    # Produce images for the GIF as we go
-    generate_and_save_images(generator, epoch + 1, seed)
+        # Produce images for the GIF as we go
+        generate_and_save_images(generator, epoch + 1, seed)
 
-    # Save the model every 15 epochs
-    if (epoch + 1) % 15 == 0:
-      checkpoint.save(file_prefix=checkpoint_prefix)
+        # Save the model every 15 epochs
+        if (epoch + 1) % 15 == 0:
+            checkpoint.save(file_prefix=checkpoint_prefix)
 
-    print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
+        print('Time for epoch {} is {} sec'.format(epoch + 1, time.time() - start))
 
-  # Generate after the final epoch
-  generate_and_save_images(generator, epochs, seed)
+    # Generate after the final epoch
+    generate_and_save_images(generator, epochs, seed)
+
 
 def generate_and_save_images(model, epoch, test_input):
-  # Notice `training` is set to False.
-  # This is so all layers run in inference mode (batchnorm).
-  predictions = model(test_input, training=False)
+    # Notice `training` is set to False.
+    # This is so all layers run in inference mode (batchnorm).
+    predictions = model(test_input, training=False)
 
-  fig = plt.figure(figsize=(4, 4))
+    fig = plt.figure(figsize=(4, 4))
 
-  for i in range(predictions.shape[0]):
-      im = predictions[i].numpy()
-      im = im * 127.5 + 127.5
-      im = im.astype(int)
-      plt.subplot(4, 4, i + 1)
-      plt.imshow(im)
-      plt.axis('off')
+    for i in range(predictions.shape[0]):
+        im = predictions[i].numpy()
+        im = im * 127.5 + 127.5
+        im = im.astype(int)
+        plt.subplot(4, 4, i + 1)
+        plt.imshow(im)
+        plt.axis('off')
 
-  plt.savefig('output/images/image_at_epoch_{:04d}.png'.format(epoch))
-  plt.show()
+    plt.savefig('output/images/image_at_epoch_{:04d}.png'.format(epoch))
+    plt.show()
 
 
 train(train_dataset, EPOCHS)
