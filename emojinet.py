@@ -4,6 +4,7 @@ import time
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
+import gif
 
 class EmojiGan:
     """
@@ -75,7 +76,7 @@ class EmojiGan:
         # ----- CKPT CONFIG ----- #
         if not os.path.exists(f'output/checkpoints/'):
             os.mkdir(f'output/checkpoints/')
-        checkpoint_dir = 'output/training_checkpoints'
+        checkpoint_dir = 'output/checkpoints'
         checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
         checkpoint = tf.train.Checkpoint(
             generator_optimizer=self.generator_optimizer,
@@ -103,6 +104,8 @@ class EmojiGan:
 
         # Generate after the final epoch
         self.generate_and_save_images(self.generator, epochs, self.SEED)
+
+        gif.create_gif(f'output/images/image*.png', f'output/emojigan.gif')
 
         print(f'TRAINING FINISHED')
 
