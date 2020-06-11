@@ -146,23 +146,24 @@ class EmojiReader:
 
         for db in self.databases:
             im_path = f'emoji-data/sheet_{db}_{pixel}.png'
-            im = Image.open(im_path)
 
-            # Convert to RGB if we don't want RGBA
-            if png_format == f'RGB':
+            # Images are  as RGBA
+            if png_format == f'RGBA':
+                # Because the RGB values are random at places where
+                # alpha == 0, we set it manually to white
+                im = np.asarray(imageio.imread(im_path))  # use imageio library
+                im[im[:, :, 3] == 0] = [255, 255, 255, 0]
+                im = Image.fromarray(im)
+            else:
+                # Use RGB
+                im = Image.open(im_path)  # use PIL library
                 im.load()  # needed for split()
                 background = Image.new(f'RGB', im.size, (255, 255, 255))
                 background.paste(im, mask=im.split()[3])  # 3 is the alpha channel
                 im = background
-            else:
-                # Because the RGB values are random at places where
-                # alpha == 0, we set it manually to white
-                im = np.asarray(im)
-                im.setflags(write=True)
-                im[im[:, :, 3] == 0] = [255, 255, 255, 0]
-                im = Image.fromarray(im)
 
             im.show() if debugging else ...  # debug: show sheet
+            sys.exit()
             im = np.asarray(im)
 
             for i in range(len(self.selected_meta_data)):

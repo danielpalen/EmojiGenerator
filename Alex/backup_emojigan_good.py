@@ -8,6 +8,7 @@ import tensorflow as tf
 import sys
 import os
 import time
+from PIL import Image
 
 """
     | Fields | Description |
@@ -46,17 +47,19 @@ for i in range(len(data)):
 
 # ---------- Extracting the images ----------- #
 
+# ---------- Extracting the images ----------- #
+
 im_path = f'../emoji-data/sheet_apple_32.png'
 pixel = 32
 
 # Remember this!!! This is how to read and write png preserving quality
 img = imageio.imread(im_path)
+img = np.asarray(img)
 imageio.imwrite(f'test.png', img)
 
 imgs = []
 
-for i in range(0, 1):
-# for i in range(len(emojis)):
+for i in range(38, 44):
     em = emojis[i]
     x = em[f'sheet_x']
     y = em[f'sheet_y']
@@ -68,12 +71,25 @@ for i in range(0, 1):
     start_y = gaps_y + pixel * y
 
     # Attention: x and y axis are changed
-    imgs.append(img[start_y:start_y+pixel, start_x:start_x+pixel])
+    im = img[start_y:start_y+pixel, start_x:start_x+pixel]
 
-    plt.imshow(img[start_y:start_y+pixel, start_x:start_x+pixel])
+    # KEEP RGBA
+    # Fill white everywhere alpha == 0
+    im[im[:, :, 3] == 0] = [255, 255, 255, 0]
+
+    # WORK WITH RGB
+    # im = Image.fromarray(im)
+    # im.load()  # needed for split()
+    # background = Image.new('RGB', im.size, (255, 255, 255))
+    # background.paste(im, mask=im.split()[3])  # 3 is the alpha channel
+    # im = np.asarray(background)
+
+    imgs.append(im)
+    plt.imshow(im)
     plt.savefig(f'../output/images/emoji_{i}.png')
+    plt.show()
     plt.clf()
-plt.show()
+    # print(im)
 
 # ---------- PREPROCESSING ----------- #
 
