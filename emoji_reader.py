@@ -12,31 +12,14 @@ from PIL import Image
 import shutil
 
 
-"""
-    | Fields | Description |
-    | ------ | ----------- |
-    | `name` | The offical Unicode name, in SHOUTY UPPERCASE. |
-    | `category` | The offical Unicode name, in SHOUTY UPPERCASE. |
-    | `unified` | The Unicode codepoint, as 4-5 hex digits. Where an emoji needs 2 or more codepoints, they are specified like 1F1EA-1F1F8. For emoji that need to specifiy a variation selector (-FE0F), that is included here. |
-    | `non_qualified` | For emoji that also have usage without a variation selector, that version is included here (otherwise is null). |
-    | `docomo`, `au`,<br>`softbank`, `google` | The legacy Unicode codepoints used by various mobile vendors. |
-    | `image` | The name of the image file. |
-    | `sheet_x`, `sheet_y` | The position of the image in the spritesheets. |
-    | `short_name` | The commonly-agreed upon short name for the image, as supported in campfire, github etc via the :colon-syntax: |
-    | `short_names` | An array of all the known short names. |
-    | `text` | An ASCII version of the emoji (e.g. `:)`), or null where none exists. |
-    | `texts` | An array of ASCII emoji that should convert into this emoji. Each ASCII emoji will only appear against a single emoji entry. |
-    | `has_img_*` | A flag for whether the given image set has an image (named by the image prop) available. |
-    | `added_id` | Emoji version in which this codepoint/sequence was added (previously Unicode version). |
-    | `skin_variations` | For emoji with multiple skin tone variations, a list of alternative glyphs, keyed by the skin tone. For emoji that support multiple skin tones within a single emoji, each skin tone is separated by a dash character. |
-    | `obsoletes`, `obsoleted_by` | Emoji that are no longer used, in preference of gendered versions. |
-"""
-
 class EmojiReader:
     """
     This class reads emojis from the https://github.com/iamcal/emoji-data
     emoji data collection. For this to work, please download the data
     into a folder 'emoji-data' that is at the same level as this file.
+
+    When instantiating, the user has to select the emoji that shall be used.
+    By calling a function, the images are returned as numpy array.
     """
 
     def __init__(self, databases, in_all_db=True, categories=None, emoji_names=None):
@@ -219,6 +202,7 @@ class EmojiReader:
 
     def apply_preprocessing(self):
         """
+        TODO: DO we want to add an option for gaussian preprocessing?
         Convert self.images_as_np to float, make them fall around 0
         and into [-1, 1].
         :return: true if successful
