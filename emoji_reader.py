@@ -209,8 +209,9 @@ class EmojiReader:
         """
         images = self.images_as_np
         images = np.asarray(images)
-        images = images.astype(float)
+        images = images.astype(np.float32)
         images = (images - 127.5) / 127.5
+        self.images_as_np = images
 
         self.applied_preprocessing = True
 
