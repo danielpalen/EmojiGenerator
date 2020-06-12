@@ -230,7 +230,7 @@ class EmojiReader:
         into batches. It uses the internal self.images_as_np variable.
         Make sure each entry in images_as_np represents an image.
 
-        :param batch_size: the batch size that we wich
+        :param batch_size: the desired batch size
         :return: a tensorflow Dataset
         """
         if not self.applied_preprocessing:
