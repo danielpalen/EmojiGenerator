@@ -14,7 +14,7 @@ class EmojiGan:
     This class simplifies the creation of a generative
     adversarial network to learn generating emoji.
     """
-    def __init__(self, batch_size, noise_dim, gen_lr=1e-4,
+    def __init__(self, batch_size=256, noise_dim=100, gen_lr=1e-4,
                  dis_lr=1e-4, restore_ckpt=False, examples=16):
         self.BATCH_SIZE = batch_size
         self.NOISE_DIM = noise_dim
@@ -68,6 +68,8 @@ class EmojiGan:
         self.generator_optimizer.apply_gradients(zip(gradients_of_generator, self.generator.trainable_variables))
         self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.discriminator.trainable_variables))
 
+        # TODO: BITTE KONTROLLIEREN, OB MAN IN TF.FUNCTION EINEN RETURN WERT HABEN KANN
+        # TODO: BITT AUCH MEINE BERECHNUNG WEITER UNTEN VON DEM RUNNING AVERAGE UEBERPRUEFEN
         return gen_loss, disc_loss
 
     def train(self, dataset, epochs):
