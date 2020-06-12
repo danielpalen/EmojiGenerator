@@ -11,7 +11,7 @@ def create_gif(glob_img_path, gif_path):
     :param gif_path: the name of the gif
     :return: true, if gif has been created
     """
-    print(f'CREATE GIF FILE:')
+    print(f'\nCREATE GIF FILE:')
     with imageio.get_writer(gif_path, mode='I') as writer:
         filenames = glob.glob(glob_img_path)
         filenames = sorted(filenames)
@@ -28,6 +28,8 @@ def create_gif(glob_img_path, gif_path):
             writer.append_data(image)
         image = imageio.imread(filename)
         writer.append_data(image)
+
+    print(f'- Gif saved at {gif_path}')
 
 
 if __name__ == '__main__':

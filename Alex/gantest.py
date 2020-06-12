@@ -9,7 +9,7 @@ import preprocessing
 # ---------- HYPERPARAMETERS ---------- #
 
 NOISE_DIM = 100
-EPOCHS = 500
+EPOCHS = 10
 BATCH_SIZE = 256
 
 # ---------- CREATE DATASET ----------- #
