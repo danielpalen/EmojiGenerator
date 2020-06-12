@@ -44,9 +44,6 @@ class EmojiReader:
         self.databases = databases
         self.images_as_np = None
 
-        # Remind user to preprocess images
-        self.applied_preprocessing = False
-
         # Load emoji meta data
         self.EMOJI_BASE_PATH = os.path.join('.', 'emoji-data')
         with open(os.path.join(self.EMOJI_BASE_PATH, 'emoji.json')) as f:
@@ -201,48 +198,7 @@ class EmojiReader:
 
         self.images_as_np = np.asarray(images, dtype=np.float32)
 
-        return True
-
-    def apply_preprocessing(self):
-        """
-        TODO: DO we want to add an option for gaussian preprocessing?
-        Convert self.images_as_np to float, make them fall around 0
-        and into [-1, 1].
-        :return: true if successful
-        """
-        images = self.images_as_np
-        images = np.asarray(images, np.float32)
-        images = (images - 127.5) / 127.5
-        self.images_as_np = images
-
-        self.applied_preprocessing = True
-
-        print(f'Preprocessing:')
-        print(f'- {np.average(images, axis=(0, 1, 2))} should be around 0')
-        print(f'- {np.min(images, axis=(0, 1, 2))} should be around -1')
-        print(f'- {np.max(images, axis=(0, 1, 2))} should be around 1\n')
-
-        return True
-
-    def get_tf_dataset(self, batch_size):
-        """
-        Create a tensorflow dataset which is shuffled and divided
-        into batches. It uses the internal self.images_as_np variable.
-        Make sure each entry in images_as_np represents an image.
-
-        :param batch_size: the desired batch size
-        :return: a tensorflow Dataset
-        """
-        if not self.applied_preprocessing:
-            print(f'\x1b[1;31;43mWarning: Data not yet preprocessed.\x1b[0m\n')
-
-        buffer_size = 60000
-
-        # Batch and shuffle the data
-        tf_dataset = tf.data.Dataset.from_tensor_slices(self.images_as_np)
-        tf_dataset = tf_dataset.shuffle(buffer_size).batch(batch_size)
-
-        return tf_dataset
+        return self.images_as_np
 
 
 if __name__ == '__main__':

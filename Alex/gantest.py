@@ -3,6 +3,8 @@ from emojigan import EmojiGan
 import models
 from emoji_reader import EmojiReader
 from utilities import constants
+from utilities import helper
+import preprocessing
 
 # ---------- HYPERPARAMETERS ---------- #
 
@@ -13,11 +15,10 @@ BATCH_SIZE = 256
 # ---------- CREATE DATASET ----------- #
 
 reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_SMILING_EMOJIS)
-reader.read_images_from_sheet(pixel=32, debugging=False, png_format='RGB')
-reader.apply_preprocessing()
-print(reader.images_as_np.shape)
+images = reader.read_images_from_sheet(pixel=32, debugging=False, png_format='RGB')
+images = preprocessing.apply_std_preprocessing(images)
 
-train_dataset = reader.get_tf_dataset(batch_size=BATCH_SIZE)
+train_dataset = helper.create_tf_dataset_from_np(images, batch_size=BATCH_SIZE)
 
 # ---------- CREATE GAN ----------- #
 
