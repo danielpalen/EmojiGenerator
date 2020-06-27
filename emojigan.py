@@ -6,7 +6,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 
-from utilities import gif
+# from utilities import gif
 
 
 class EmojiGan:
@@ -131,7 +131,7 @@ class EmojiGan:
 
         print(f'\nTRAINING FINISHED (Time: {format(time.time() - train_time, ".2f")} sec)')
 
-        gif.create_gif(f'output/images/image*.png', f'output/emojigan.gif')
+        # gif.create_gif(f'output/images/image*.png', f'output/emojigan.gif')
 
 
     @staticmethod
@@ -148,6 +148,7 @@ class EmojiGan:
             plt.subplot(4, 4, i + 1)
             plt.imshow(im)
             plt.axis('off')
+            plt.close(fig)
 
         plt.savefig('output/images/image_at_epoch_{:04d}.png'.format(epoch))
-        plt.show()
+        # plt.show()
