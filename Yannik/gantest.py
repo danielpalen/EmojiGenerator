@@ -8,8 +8,8 @@ import preprocessing
 
 # ---------- HYPERPARAMETERS ---------- #
 
-NOISE_DIM = 20
-EPOCHS = 3000
+NOISE_DIM = 100
+EPOCHS = 2000
 BATCH_SIZE = 64
 
 # ---------- CREATE DATASET ----------- #
@@ -25,7 +25,7 @@ train_dataset = helper.create_tf_dataset_from_np(images, batch_size=BATCH_SIZE)
 # First create a GAN object
 emg = EmojiGan(
     batch_size=BATCH_SIZE, noise_dim=NOISE_DIM, gen_lr=2e-5,
-    dis_lr=2e-4, restore_ckpt=True, examples=8, loss_func="cross_entropy"
+    dis_lr=2e-4, restore_ckpt=False, examples=8, loss_func="cross_entropy"
 )
 # Add Generator
 emg.generator = models.std_generator_model(

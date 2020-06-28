@@ -27,8 +27,12 @@ class EmojiGan:
 
         self.cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
-        self.generator_optimizer = tf.keras.optimizers.Adam(gen_lr)
-        self.discriminator_optimizer = tf.keras.optimizers.Adam(dis_lr)
+        if self.LOSS == "cross_entropy":
+            self.generator_optimizer = tf.keras.optimizers.Adam(gen_lr)
+            self.discriminator_optimizer = tf.keras.optimizers.Adam(dis_lr)
+        elif self.LOSS == "wasserstein":
+            self.generator_optimizer = tf.keras.optimizers.RMSprop(learning_rate=gen_lr, clipnorm=0.1)
+            self.discriminator_optimizer = tf.keras.optimizers.RMSprop(learning_rate=dis_lr, clipnorm=0.1)
 
         # ----- EXAMPLES ----- #
         # We reuse the same seed over time
@@ -46,13 +50,13 @@ class EmojiGan:
         return total_loss
 
     def wasserstein_critic_loss(self, real_output, fake_output):
-        return tf.math.reduce_mean(real_output * fake_output)
+        return tf.math.reduce_mean(real_output) - tf.math.reduce_mean(fake_output)
 
     def cross_entropy_generator_loss(self, fake_output):
         return self.cross_entropy(tf.ones_like(fake_output), fake_output)
 
     def wasserstein_generator_loss(self, fake_output):
-        return - tf.reduce_mean(fake_output)
+        return tf.reduce_mean(fake_output)
 
     # Notice the use of `tf.function`
     # This annotation causes the function to be "compiled".
@@ -119,11 +123,6 @@ class EmojiGan:
 
             for image_batch in dataset:
                 gen_loss, disc_loss = self.train_step(image_batch)
-
-                # Clip weights after each bach update if we use wasserstein loss
-                if self.LOSS == 'wasserstein':
-                    self.discriminator.trainable_variables = tf.clip_by_value(
-                        self.discriminator.trainable_variables, -0.01, 0.010)
 
                 gen_loss_avg += gen_loss
                 disc_loss_avg += disc_loss
