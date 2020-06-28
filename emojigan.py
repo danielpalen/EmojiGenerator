@@ -45,14 +45,14 @@ class EmojiGan:
         total_loss = real_loss + fake_loss
         return total_loss
 
-    def wasserstein_discriminator_loss(self, real_output, fake_output):
-        return -tf.math.reduce_mean(real_output) + tf.math.reduce_mean(fake_output)
+    def wasserstein_critic_loss(self, real_output, fake_output):
+        return tf.math.reduce_mean(real_output * fake_output)
 
     def cross_entropy_generator_loss(self, fake_output):
         return self.cross_entropy(tf.ones_like(fake_output), fake_output)
 
     def wasserstein_generator_loss(self, fake_output):
-        return -tf.reduce_mean(fake_output)
+        return - tf.reduce_mean(fake_output)
 
     # Notice the use of `tf.function`
     # This annotation causes the function to be "compiled".
@@ -69,9 +69,10 @@ class EmojiGan:
             if self.LOSS == "cross_entropy":
                 gen_loss = self.cross_entropy_generator_loss(fake_output)
                 disc_loss = self.cross_entropy_discriminator_loss(real_output, fake_output)
+
             elif self.LOSS == "wasserstein":
                 gen_loss = self.wasserstein_generator_loss(fake_output)
-                disc_loss = self.wasserstein_discriminator_loss(real_output, fake_output)
+                disc_loss = self.wasserstein_critic_loss(real_output, fake_output)
 
         gradients_of_generator = gen_tape.gradient(gen_loss, self.generator.trainable_variables)
         gradients_of_discriminator = disc_tape.gradient(disc_loss, self.discriminator.trainable_variables)
@@ -118,6 +119,11 @@ class EmojiGan:
 
             for image_batch in dataset:
                 gen_loss, disc_loss = self.train_step(image_batch)
+
+                # Clip weights after each bach update if we use wasserstein loss
+                if self.LOSS == 'wasserstein':
+                    self.discriminator.trainable_variables = tf.clip_by_value(
+                        self.discriminator.trainable_variables, -0.01, 0.010)
 
                 gen_loss_avg += gen_loss
                 disc_loss_avg += disc_loss
