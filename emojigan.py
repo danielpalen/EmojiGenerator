@@ -15,11 +15,12 @@ class EmojiGan:
     adversarial network to learn generating emoji.
     """
     def __init__(self, batch_size=256, noise_dim=100, gen_lr=1e-4,
-                 dis_lr=1e-4, restore_ckpt=False, examples=16):
+                 dis_lr=1e-4, restore_ckpt=False, examples=16, loss_func="cross_entropy"):
         self.BATCH_SIZE = batch_size
         self.NOISE_DIM = noise_dim
         self.RESTORE_CKPT = restore_ckpt
         self.EXAMPLES = examples
+        self.LOSS = loss_func
 
         self.generator = None
         self.discriminator = None
@@ -38,14 +39,20 @@ class EmojiGan:
         if not os.path.exists(f'output/images'):
             os.mkdir(f'output/images/')
 
-    def discriminator_loss(self, real_output, fake_output):
+    def cross_entropy_discriminator_loss(self, real_output, fake_output):
         real_loss = self.cross_entropy(tf.ones_like(real_output), real_output)
         fake_loss = self.cross_entropy(tf.zeros_like(fake_output), fake_output)
         total_loss = real_loss + fake_loss
         return total_loss
 
-    def generator_loss(self, fake_output):
+    def wasserstein_discriminator_loss(self, real_output, fake_output):
+        return -tf.math.reduce_mean(real_output) + tf.math.reduce_mean(fake_output)
+
+    def cross_entropy_generator_loss(self, fake_output):
         return self.cross_entropy(tf.ones_like(fake_output), fake_output)
+
+    def wasserstein_generator_loss(self, fake_output):
+        return -tf.reduce_mean(fake_output)
 
     # Notice the use of `tf.function`
     # This annotation causes the function to be "compiled".
@@ -59,8 +66,12 @@ class EmojiGan:
             real_output = self.discriminator(images, training=True)
             fake_output = self.discriminator(generated_images, training=True)
 
-            gen_loss = self.generator_loss(fake_output)
-            disc_loss = self.discriminator_loss(real_output, fake_output)
+            if self.LOSS == "cross_entropy":
+                gen_loss = self.cross_entropy_generator_loss(fake_output)
+                disc_loss = self.cross_entropy_discriminator_loss(real_output, fake_output)
+            elif self.LOSS == "wasserstein":
+                gen_loss = self.wasserstein_generator_loss(fake_output)
+                disc_loss = self.wasserstein_discriminator_loss(real_output, fake_output)
 
         gradients_of_generator = gen_tape.gradient(gen_loss, self.generator.trainable_variables)
         gradients_of_discriminator = disc_tape.gradient(disc_loss, self.discriminator.trainable_variables)
