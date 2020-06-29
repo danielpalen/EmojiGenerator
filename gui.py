@@ -19,8 +19,7 @@ class GUI:
         self.texts_labels = range(len(self.texts))
         self.entries = [Entry(self.root) for t in self.texts]
 
-        self.image_canvas = None
-        self.image_on_canvas = None
+        self.canvas_update = None
 
         self.build_gui()
 
@@ -40,13 +39,14 @@ class GUI:
         # Canvas to display progress every now and then
         image_canvas = Canvas(self.root, width=500, height=500)
         image_canvas.pack()
-        image_canvas.place(x=500-image_canvas.winfo_width()/2, y=375-image_canvas.winfo_height()/2-150)
+        image_canvas.place(x=550-image_canvas.winfo_width()/2, y=150-image_canvas.winfo_height()/2)
         img = PhotoImage(file='output/images/image_at_epoch_0001.png')
         image_on_canvas = image_canvas.create_image(250, 250, image=img)
+        self.canvas_update = [image_canvas, image_on_canvas, self.root]
 
-        Button(self.root, text='Run training', command=self.button_func, width=20).place(x=675, y=50)
-        progress_label = Label(self.root, text='Progress:').place(x=675, y=100)
-        progess_text = Text(self.root, height=1, width=15).place(x=750, y=100)
+        Button(self.root, text='Run training', command=self.button_func, width=20).place(x=700, y=50)
+        progress_label = Label(self.root, text='Progress:').place(x=700, y=100)
+        progess_text = Text(self.root, height=1, width=15).place(x=775, y=100)
 
         # Run gui
         self.root.mainloop()
@@ -58,7 +58,7 @@ class GUI:
         self.new_training.NOISE_DIM = int(self.entries[2].get())
         self.new_training.BATCH_SIZE = int(self.entries[3].get())
         self.new_training.EPOCHS = int(self.entries[4].get())
-        self.new_training.training()
+        self.new_training.training(self.canvas_update)
 
 
 if __name__ == "__main__":
