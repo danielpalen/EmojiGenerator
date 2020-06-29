@@ -58,7 +58,7 @@ class GUI:
         self.new_training.NOISE_DIM = int(self.entries[2].get())
         self.new_training.BATCH_SIZE = int(self.entries[3].get())
         self.new_training.EPOCHS = int(self.entries[4].get())
-        self.new_training.training(self.image_canvas, self.image_on_canvas)
+        self.new_training.training()
 
 
 if __name__ == "__main__":
