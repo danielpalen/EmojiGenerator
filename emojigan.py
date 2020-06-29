@@ -88,7 +88,7 @@ class EmojiGan:
         # TODO: BITT AUCH MEINE BERECHNUNG WEITER UNTEN VON DEM RUNNING AVERAGE UEBERPRUEFEN
         return gen_loss, disc_loss
 
-    def train(self, dataset, epochs, image_canvas):
+    def train(self, dataset, epochs):
 
         # ----- CHECKS ----- #
         # Generator and discirminator have been set
@@ -132,7 +132,7 @@ class EmojiGan:
             disc_loss_avg = disc_loss_avg / batch_counter
 
             # Produce images for the GIF as we go
-            self.generate_and_save_images(self.generator, epoch + 1, self.SEED, image_canvas)
+            self.generate_and_save_images(self.generator, epoch + 1, self.SEED)
 
             # Save the model every 15 epochs
             if (epoch + 1) % 15 == 0:
@@ -143,7 +143,7 @@ class EmojiGan:
                   f'Disc loss: {format(disc_loss_avg, ".4f")}')
 
         # Generate after the final epoch
-        self.generate_and_save_images(self.generator, epochs, self.SEED, image_canvas)
+        self.generate_and_save_images(self.generator, epochs, self.SEED)
 
         print(f'\nTRAINING FINISHED (Time: {format(time.time() - train_time, ".2f")} sec)')
 
@@ -151,7 +151,7 @@ class EmojiGan:
 
 
     @staticmethod
-    def generate_and_save_images(model, epoch, test_input, image_canvas):
+    def generate_and_save_images(model, epoch, test_input):
         # 'Training' = False, so net runs in inference mode (batchnorm)
         predictions = model(test_input, training=False)
 
@@ -166,10 +166,12 @@ class EmojiGan:
             plt.axis('off')
             plt.close(fig)
 
+        image_canvas = None
+        image_on_canvas = None
         plt.savefig('output/images/image_at_epoch_{:04d}.png'.format(epoch))
-        if image_canvas is not None:
+        if (image_canvas is not None) and (image_on_canvas is not None):
             if epoch % 10 == 0:
                 img = PhotoImage(file='output/images/image_at_epoch_{:04d}.png'.format(epoch))
-                image_canvas.create_image(250, 250, image=img)
+                image_canvas.itemconfig(image_on_canvas, image=img)
                 print("Image canvas updated.")
         # plt.show()

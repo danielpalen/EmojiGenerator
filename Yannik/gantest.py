@@ -34,7 +34,7 @@ class EmojiGANTraining:
     def set_disc_lr(self, x):
         self.DISC_LR = x
 
-    def training(self, image_canvas=None):
+    def training(self):
         """ Runs the DCGAN training.
 
         :param: image_canvas: Image canvas of the gui, to display training progress.
@@ -67,7 +67,7 @@ class EmojiGANTraining:
 
         # ---------- TRAINING ----------- #
         # And off you go
-        emg.train(dataset=train_dataset, epochs=self.EPOCHS, image_canvas=image_canvas)
+        emg.train(dataset=train_dataset, epochs=self.EPOCHS)
 
 
 if __name__ == "__main__":
