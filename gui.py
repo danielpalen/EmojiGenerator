@@ -45,8 +45,9 @@ class GUI(threading.Thread):
     def build_gui(self):
         # Root node
         self.root = Tk()
-        self.root.geometry("1280x720+30+30")
+        self.root.geometry("640x720+30+30")
         self.root.title("Emoji-GAN")
+        self.root.resizable(width=False, height=False)
 
         # Tabs
         tab_parent = ttk.Notebook(self.root)
@@ -80,15 +81,15 @@ class GUI(threading.Thread):
         # Canvas to display progress every now and then
         self.image_canvas = Canvas(tab2, width=500, height=500)
         self.image_canvas.pack()
-        self.image_canvas.place(x=550-self.image_canvas.winfo_width()/2,
+        self.image_canvas.place(x=50-self.image_canvas.winfo_width()/2,
                                 y=150-self.image_canvas.winfo_height()/2)
         self.image_on_canvas = self.image_canvas.create_image(250, 250, image=None)
 
         # Training button
-        Button(tab2, text='Run training', command=self.button_func, width=20).place(x=700, y=50)
-        progress_label = Label(tab2, text='Progress:').place(x=700, y=100)
+        Button(tab2, text='Run training', command=self.button_func, width=20).place(x=200, y=50)
+        progress_label = Label(tab2, text='Progress:').place(x=200, y=100)
         self.progress_text = Text(tab2, height=1, width=15)
-        self.progress_text.place(x=775, y=100)
+        self.progress_text.place(x=275, y=100)
 
         # Update gui
         self.root.update()
