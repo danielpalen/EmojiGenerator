@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import ttk
 import random
 import os
 import threading
@@ -45,12 +46,24 @@ class GUI(threading.Thread):
         # Root node
         self.root = Tk()
         self.root.geometry("1280x720+30+30")
+        self.root.title("Emoji-GAN")
 
+        # Tabs
+        tab_parent = ttk.Notebook(self.root)
+        tab1 = ttk.Frame(tab_parent)
+        tab2 = ttk.Frame(tab_parent)
+        tab3 = ttk.Frame(tab_parent)
+        tab_parent.add(tab1, text='Hyperparameters')
+        tab_parent.add(tab2, text='Training')
+        tab_parent.add(tab3, text='Pix2Pix')
+        tab_parent.pack(expand=1, fill='both')
+
+        # Hyperparameter entry widgets
         self.texts = ['Learning Rate Generator', 'Learning Rate Discriminator', 'Noise Dimension', 'Batch Size',
                       'Iterations', 'Restore Checkpoint']
         self.texts_defaults = ['2e-4', '2e-5', '100', '64', '1000', 'False']
         self.texts_labels = range(len(self.texts))
-        self.entries = [Entry(self.root) for t in self.texts]
+        self.entries = [Entry(tab1) for t in self.texts]
 
         for label in self.texts_labels:
             # Colors
@@ -59,25 +72,24 @@ class GUI(threading.Thread):
             bg_colour = '#' + "".join(ct_hex)
 
             # Labels for training hyperparameters
-            lab = Label(self.root, text=self.texts[label], bg=bg_colour)
+            lab = Label(tab1, text=self.texts[label], bg=bg_colour)
             lab.place(x=20, y=30 + label*60, width=200, height=50)
             self.entries[label].place(x=250, y=30 + label*60, width=200, height=50)
             self.entries[label].insert(0, self.texts_defaults[label])
 
         # Canvas to display progress every now and then
-        self.image_canvas = Canvas(self.root, width=500, height=500)
+        self.image_canvas = Canvas(tab2, width=500, height=500)
         self.image_canvas.pack()
         self.image_canvas.place(x=550-self.image_canvas.winfo_width()/2,
                                 y=150-self.image_canvas.winfo_height()/2)
-        # img = PhotoImage(file='output/images/image_at_epoch_0001.png')
         self.image_on_canvas = self.image_canvas.create_image(250, 250, image=None)
 
-        Button(self.root, text='Run training', command=self.button_func, width=20).place(x=700, y=50)
-        progress_label = Label(self.root, text='Progress:').place(x=700, y=100)
-        self.progress_text = Text(self.root, height=1, width=15)
+        # Training button
+        Button(tab2, text='Run training', command=self.button_func, width=20).place(x=700, y=50)
+        progress_label = Label(tab2, text='Progress:').place(x=700, y=100)
+        self.progress_text = Text(tab2, height=1, width=15)
         self.progress_text.place(x=775, y=100)
 
-        # Run gui
-        # self.root.mainloop()
+        # Update gui
         self.root.update()
 
