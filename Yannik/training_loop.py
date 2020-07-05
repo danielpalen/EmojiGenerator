@@ -2,11 +2,17 @@ import time
 from gui import GUI
 from Yannik.gantest import EmojiGANTraining
 
+use_gui = False
+
 training_instance = EmojiGANTraining()
 gui_instance = GUI(training_instance)
-gui_instance.build_gui()
 
-while not training_instance.initialization_flag:
+if use_gui:
+    gui_instance.build_gui()
+else:
+    training_instance.initialize()
+
+while (not training_instance.initialization_flag) and use_gui:
     time.sleep(0.01)
     gui_instance.root.update()
 
@@ -35,6 +41,7 @@ for epoch in range(training_instance.EPOCHS + 1):
     # Save the model every 15 epochs
     if epoch % 15 == 0:
         training_instance.checkpoint.save(file_prefix=training_instance.checkpoint_prefix)
+    if use_gui:
         gui_instance.image_canvas_update(path='output/images/image_at_epoch_{:04d}.png'.format(epoch),
                                          progress_text_update=f"{epoch}/{training_instance.EPOCHS}")
 
