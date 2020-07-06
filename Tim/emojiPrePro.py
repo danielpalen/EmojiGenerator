@@ -2,7 +2,7 @@ import PIL
 import imageio
 from pandas import np
 
-from emoji_reader import EmojiReader
+from EmojiReader import EmojiReader
 from utilities import constants
 from PIL import Image
 import scipy.misc
