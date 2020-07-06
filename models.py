@@ -121,8 +121,6 @@ def std_discriminator_model(input_shape, my_layers, std_dropout=0.3):
     model.add(layers.Flatten())
     model.add(layers.Dense(1))
 
-    # TODO: Should we not use a sigmoid for the output for binary classification?
-
     print(f'DISCRIMINATOR NETWORK MODEL')
     print(model.summary())
 
