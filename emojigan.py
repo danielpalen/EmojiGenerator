@@ -1,10 +1,6 @@
-import sys
 import os
-import time
-
 import tensorflow as tf
 import matplotlib.pyplot as plt
-import numpy as np
 from tkinter import PhotoImage
 # from utilities import gif
 
@@ -58,9 +54,8 @@ class EmojiGan:
     # This annotation causes the function to be "compiled".
     @tf.function
     def train_step(self, images):
-        noise = tf.random.normal([self.BATCH_SIZE, self.NOISE_DIM])
 
-        # Initialize Gui object
+        noise = tf.random.normal([self.BATCH_SIZE, self.NOISE_DIM])
 
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
             generated_images = self.generator(noise, training=True)
@@ -68,13 +63,8 @@ class EmojiGan:
             real_output = self.discriminator(images, training=True)
             fake_output = self.discriminator(generated_images, training=True)
 
-            if self.LOSS == "cross_entropy":
-                gen_loss = self.cross_entropy_generator_loss(fake_output)
-                disc_loss = self.cross_entropy_discriminator_loss(real_output, fake_output)
-
-            elif self.LOSS == "wasserstein":
-                gen_loss = self.wasserstein_generator_loss(fake_output)
-                disc_loss = self.wasserstein_critic_loss(real_output, fake_output)
+            gen_loss = self.cross_entropy_generator_loss(fake_output)
+            disc_loss = self.cross_entropy_discriminator_loss(real_output, fake_output)
 
         gradients_of_generator = gen_tape.gradient(gen_loss, self.generator.trainable_variables)
         gradients_of_discriminator = disc_tape.gradient(disc_loss, self.discriminator.trainable_variables)
