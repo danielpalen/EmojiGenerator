@@ -1,11 +1,11 @@
 import time
-from Gui import GUI
+from Gui import Gui
 from EmojiGANTraining import EmojiGANTraining
 
 use_gui = True
 
 training_instance = EmojiGANTraining()
-gui_instance = GUI(training_instance)
+gui_instance = Gui(training_instance)
 
 if use_gui:
     gui_instance.build_gui()

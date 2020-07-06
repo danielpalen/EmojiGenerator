@@ -5,7 +5,7 @@ import os
 import threading
 
 
-class GUI(threading.Thread):
+class Gui(threading.Thread):
 
     def __init__(self, training_instance):
         threading.Thread.__init__(self)
