@@ -51,14 +51,8 @@ class EmojiGan:
         total_loss = real_loss + fake_loss
         return total_loss
 
-    def wasserstein_critic_loss(self, real_output, fake_output):
-        return tf.math.reduce_mean(real_output) - tf.math.reduce_mean(fake_output)
-
     def cross_entropy_generator_loss(self, fake_output):
         return self.cross_entropy(tf.ones_like(fake_output), fake_output)
-
-    def wasserstein_generator_loss(self, fake_output):
-        return tf.reduce_mean(fake_output)
 
     # Notice the use of `tf.function`
     # This annotation causes the function to be "compiled".
@@ -91,8 +85,6 @@ class EmojiGan:
         # TODO: BITTE KONTROLLIEREN, OB MAN IN TF.FUNCTION EINEN RETURN WERT HABEN KANN
         # TODO: BITT AUCH MEINE BERECHNUNG WEITER UNTEN VON DEM RUNNING AVERAGE UEBERPRUEFEN
         return gen_loss, disc_loss
-
-
 
     @staticmethod
     def generate_and_save_images(model, epoch, test_input, canvas_update):

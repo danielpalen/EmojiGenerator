@@ -1,14 +1,11 @@
-import sys
 import os
 import models
 import time
-import threading
 import tensorflow as tf
 from emojigan import EmojiGan
 from emoji_reader import EmojiReader
 from utilities import constants
 from utilities import helper
-from gui import GUI
 import preprocessing
 
 
