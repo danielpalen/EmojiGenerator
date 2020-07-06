@@ -1,7 +1,7 @@
 import sys
-from emojigan import EmojiGan
+from EmojiGAN import EmojiGan
 import models
-from emoji_reader import EmojiReader
+from EmojiReader import EmojiReader
 from utilities import constants
 from utilities import helper
 import preprocessing

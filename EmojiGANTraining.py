@@ -2,8 +2,8 @@ import os
 import models
 import time
 import tensorflow as tf
-from emojigan import EmojiGan
-from emoji_reader import EmojiReader
+from EmojiGAN import EmojiGan
+from EmojiReader import EmojiReader
 from utilities import constants
 from utilities import helper
 import preprocessing
