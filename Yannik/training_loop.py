@@ -2,7 +2,7 @@ import time
 from gui import GUI
 from Yannik.gantest import EmojiGANTraining
 
-use_gui = False
+use_gui = True
 
 training_instance = EmojiGANTraining()
 gui_instance = GUI(training_instance)
