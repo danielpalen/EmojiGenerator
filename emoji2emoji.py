@@ -1,6 +1,3 @@
-import random
-import imageio
-
 import tensorflow as tf
 
 import os
@@ -8,104 +5,26 @@ import time
 
 from matplotlib import pyplot as plt
 from IPython import display
-from PIL import Image
-from pandas import np
-
-from Tim.emojiPrePro import colorChanger, preProcessing, quartering
-from EmojiReader import EmojiReader
 
 #config.gpu_options.allow_growth = True
+from EmojiReader import EmojiReader
+from utilities import constants
 
 BUFFER_SIZE = 400
 BATCH_SIZE = 1
 IMG_WIDTH = 256
 IMG_HEIGHT = 256
-#reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_SMILING_EMOJIS)
-#reader.read_images_from_sheet(pixel=IMG_WIDTH, debugging=False, png_format='RGB')
-#reader.apply_preprocessing()
-#print(reader.images_as_np.shape)
-#train_dataset = reader.get_tf_dataset(batch_size=BATCH_SIZE)
-
 
 
 _URL = 'https://people.eecs.berkeley.edu/~tinghuiz/projects/pix2pix/datasets/facades.tar.gz'
 
-#path_to_zip = tf.keras.utils.get_file('facades.tar.gz',
-#                                      origin=_URL,
-#                                      extract=True)
+PATH = f'./emoji-data/test-tim/'  # os.path.join(os.path.dirname(, '')
 
-PATH = f'C:\\Users\\trs3e\\Documents\\GitHub\\EmojiGenerator\\emoji-data\\test-tim\\'   # os.path.join(os.path.dirname(, '')
+reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_SMILING_EMOJIS)
+images = reader.generate_training_images(PATH+"train2", number_images=10, size=64, mode="pix2pix")
 
 
 #Bilder vierteilen und in q1-4 bzw. h1-4 speichern
-if(False):
-
-  for file in os.listdir(PATH+'low\\'):
-      filename = os.fsdecode(file)
-      if filename.endswith(".png"):
-          image = imageio.imread(PATH+filename)#
-
-          quartering(image,PATH,filename,'q');
-
-
-  for file in os.listdir(PATH+'high\\'):
-      filename = os.fsdecode(file)
-      if filename.endswith(".png"):
-          image = imageio.imread(PATH+filename)
-
-          quartering(image,PATH,filename,'h');
-
-
-#Neue Emojis zusammensetzen und in final speichern
-if(False):
-
-  for x in range(500):
-    print(str(x))
-    file1 =random.choice(os.listdir(PATH+'h1\\'))
-    file2 =random.choice(os.listdir(PATH+'h2\\'))
-    file3 =random.choice(os.listdir(PATH+'h3\\'))
-    file4 =random.choice(os.listdir(PATH+'h4\\'))
-    filename1 = os.fsdecode(file1)
-    filename2 = os.fsdecode(file2)
-    filename3 = os.fsdecode(file3)
-    filename4 = os.fsdecode(file4)
-    image1 = imageio.imread(PATH + 'h1\\' + filename1)
-    image2 = imageio.imread(PATH + 'h2\\' + filename2)
-    image3 = imageio.imread(PATH + 'h3\\' + filename3)
-    image4 = imageio.imread(PATH + 'h4\\' + filename4)
-    imagefinal =np.concatenate((np.concatenate((image1, image2), axis=1),np.concatenate((image3, image4), axis=1)),axis=0)
-    imageio.imwrite(PATH + 'final\\h' +str(x)+'.png' , imagefinal)
-
-  for x in range(500):
-    print(str(x))
-    file1 = random.choice(os.listdir(PATH + 'q1\\'))
-    file2 = random.choice(os.listdir(PATH + 'q2\\'))
-    file3 = random.choice(os.listdir(PATH + 'q3\\'))
-    file4 = random.choice(os.listdir(PATH + 'q4\\'))
-    filename1 = os.fsdecode(file1)
-    filename2 = os.fsdecode(file2)
-    filename3 = os.fsdecode(file3)
-    filename4 = os.fsdecode(file4)
-    image1 = imageio.imread(PATH +'q1\\'+ filename1)
-    image2 = imageio.imread(PATH +'q2\\'+ filename2)
-    image3 = imageio.imread(PATH +'q3\\'+ filename3)
-    image4 = imageio.imread(PATH +'q4\\'+ filename4)
-    imagefinal = np.concatenate((np.concatenate((image1, image2), axis=1), np.concatenate((image3, image4), axis=1)), axis=0)
-    imageio.imwrite(PATH + 'final\\q' +str(x)+'.png',imagefinal)
-
-#Trainingsdaten erstellen und in Train speichern
-  for file in os.listdir(PATH+'final\\'):
-    filename = os.fsdecode(file)
-    #file_counter += 1;
-    #if (file_counter > 10):
-     #   break;
-    if filename.endswith(".png"):
-        #   print(os.path.join('stock-market-dataset\stocks', filename))
-        image = imageio.imread(PATH+'final\\'+filename)
-        #jpg = Image.new("RGB", image.size, (255, 255, 255))
-        #jpg.pastpge(image, mask=image.split()[3])
-        preProcessing(image,PATH,filename,'imagetest');
-
 
 def load(image_file):
   image = tf.io.read_file(image_file)
@@ -124,7 +43,7 @@ def load(image_file):
 
   return input_image, real_image
 
-inp, re = load(PATH+'train\\'+'h1.jpg')
+inp, re = load(PATH+'train/'+'h1.jpg')
 # casting to int for matplotlib to show the image
 plt.figure()
 plt.imshow(inp/255.0)
@@ -389,7 +308,7 @@ def discriminator_loss(disc_real_output, disc_generated_output):
 generator_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_dir = './training_checkpoints'
+checkpoint_dir = 'Tim/training_checkpoints'
 checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
 checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
                                  discriminator_optimizer=discriminator_optimizer,
@@ -419,7 +338,7 @@ for example_input, example_target in test_dataset.take(1):
 EPOCHS = 22
 
 import datetime
-log_dir="logs/"
+log_dir= "Tim/logs/"
 
 summary_writer = tf.summary.create_file_writer(
   log_dir + "fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
