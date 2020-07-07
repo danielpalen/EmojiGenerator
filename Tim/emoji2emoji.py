@@ -12,7 +12,7 @@ from PIL import Image
 from pandas import np
 
 from Tim.emojiPrePro import colorChanger, preProcessing, quartering
-from emoji_reader import EmojiReader
+from EmojiReader import EmojiReader
 
 #config.gpu_options.allow_growth = True
 
