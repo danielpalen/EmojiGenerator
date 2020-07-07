@@ -368,11 +368,6 @@ class EmojiReader:
 
 
 
-
-
-
-
-
 if __name__ == '__main__':
     reader = EmojiReader(databases=[f'apple', f'twitter', f'facebook'], categories=['Smileys & Emotion'])
     reader.read_images_from_sheet(pixel=32)

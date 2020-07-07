@@ -45,10 +45,6 @@ def load(image_file):
 
 inp, re = load(PATH+'train/'+'h1.jpg')
 # casting to int for matplotlib to show the image
-plt.figure()
-plt.imshow(inp/255.0)
-plt.figure()
-plt.imshow(re/255.0)
 
 def resize(input_image, real_image, height, width):
   input_image = tf.image.resize(input_image, [height, width],
@@ -93,10 +89,6 @@ def random_jitter(input_image, real_image):
 plt.figure(figsize=(6, 6))
 for i in range(4):
   rj_inp, rj_re = random_jitter(inp, re)
-  plt.subplot(2, 2, i+1)
-  plt.imshow(rj_inp/255.0)
-  plt.axis('off')
-plt.show()
 
 
 def load_image_train(image_file):
@@ -237,7 +229,6 @@ tf.keras.utils.plot_model(generator, show_shapes=True, dpi=64)
 
 
 gen_output = generator(inp[tf.newaxis,...], training=False)
-plt.imshow(gen_output[0,...])
 
 
 LAMBDA = 100
@@ -289,8 +280,6 @@ tf.keras.utils.plot_model(discriminator, show_shapes=True, dpi=64)
 
 
 disc_out = discriminator([inp[tf.newaxis,...], gen_output], training=False)
-plt.imshow(disc_out[0,...,-1], vmin=-20, vmax=20, cmap='RdBu_r')
-plt.colorbar()
 
 
 loss_object = tf.keras.losses.BinaryCrossentropy(from_logits=True)
@@ -414,3 +403,4 @@ else:
   # Run the trained model on a few examples from the test dataset
   for inp, tar in test_dataset.take(12):
     generate_images(generator, inp, tar)
+

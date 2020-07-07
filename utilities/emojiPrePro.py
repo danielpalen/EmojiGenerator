@@ -3,7 +3,6 @@ from pandas import np
 import random
 
 from PIL import Image
-import scipy.misc
 
 def colorChanger(x):
 
