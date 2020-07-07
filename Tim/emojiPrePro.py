@@ -1,6 +1,7 @@
 import PIL
 import imageio
 from pandas import np
+import random
 
 from emoji_reader import EmojiReader
 from utilities import constants
@@ -26,8 +27,14 @@ def toJpg(x):
         return x
 
 def preProcessing(image,path,file,where):
-    image=np.repeat(np.repeat(image,4,axis=0),4,axis=1)
+    imageI =Image.fromarray(image)
+    imageI.rotate(random.randint(-5, 5), fillcolor='white')
+    image=np.array(imageI);
     imageorg=np.copy(image)
+    image=image[::2,::2]
+    image=np.repeat(np.repeat(image,8,axis=0),8,axis=1)
+    imageorg=np.repeat(np.repeat(imageorg,4,axis=0),4,axis=1)
+   # image.thumbnail((image, height), Image.ANTIALIAS)
     for row in image:
         for line in row:
             line[:] = colorChanger(line)
@@ -46,10 +53,10 @@ def quartering(image, path, file,which):
         imageio.imwrite(path+which+'3'+'\\'+file,image[33:,:33])
         imageio.imwrite(path+which+'4'+'\\'+file,image[33:,33:])
     else:
-        imageio.imwrite(path + which + '1' + '\\' + file, image[:37, :33])
-        imageio.imwrite(path + which + '2' + '\\' + file, image[:37, 33:])
-        imageio.imwrite(path + which + '3' + '\\' + file, image[37:, :33])
-        imageio.imwrite(path + which + '4' + '\\' + file, image[37:, 33:])
+        imageio.imwrite(path + which + '1' + '\\' + file, image[:38, :33])
+        imageio.imwrite(path + which + '2' + '\\' + file, image[:38, 33:])
+        imageio.imwrite(path + which + '3' + '\\' + file, image[38:, :33])
+        imageio.imwrite(path + which + '4' + '\\' + file, image[38:, 33:])
 
 #reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_SMILING_EMOJIS)
 

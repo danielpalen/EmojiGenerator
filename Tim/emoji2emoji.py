@@ -14,6 +14,7 @@ from pandas import np
 from Tim.emojiPrePro import colorChanger, preProcessing, quartering
 from emoji_reader import EmojiReader
 
+#config.gpu_options.allow_growth = True
 
 BUFFER_SIZE = 400
 BATCH_SIZE = 1
@@ -81,9 +82,9 @@ if(False):
     file2 = random.choice(os.listdir(PATH + 'q2\\'))
     file3 = random.choice(os.listdir(PATH + 'q3\\'))
     file4 = random.choice(os.listdir(PATH + 'q4\\'))
-    filename1  = os.fsdecode(file1)
+    filename1 = os.fsdecode(file1)
     filename2 = os.fsdecode(file2)
-    filename3  = os.fsdecode(file3)
+    filename3 = os.fsdecode(file3)
     filename4 = os.fsdecode(file4)
     image1 = imageio.imread(PATH +'q1\\'+ filename1)
     image2 = imageio.imread(PATH +'q2\\'+ filename2)
@@ -103,7 +104,7 @@ if(False):
         image = imageio.imread(PATH+'final\\'+filename)
         #jpg = Image.new("RGB", image.size, (255, 255, 255))
         #jpg.pastpge(image, mask=image.split()[3])
-        preProcessing(image,PATH,filename,'train');
+        preProcessing(image,PATH,filename,'imagetest');
 
 
 def load(image_file):
@@ -483,8 +484,14 @@ def fit(train_ds, epochs, test_ds):
 if(False):
   fit(train_dataset, EPOCHS, test_dataset)
 else:
-  checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
+  #checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
+
+  #mobilenet_save_path = os.path.join(PATH, "mobilenet/1/")
+  #tf.saved_model.save(generator, mobilenet_save_path)
+  #generator.save("model.h5");
+  generator= tf.keras.models.load_model("model_new.h5")
+  #generator = tf.saved_model.load(mobilenet_save_path)
   # Run the trained model on a few examples from the test dataset
   for inp, tar in test_dataset.take(12):
     generate_images(generator, inp, tar)
