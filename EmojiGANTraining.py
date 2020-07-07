@@ -18,6 +18,9 @@ class EmojiGANTraining:
         self.BATCH_SIZE = 64
         self.GEN_LR = 2e-5
         self.DISC_LR = 2e-4
+        self.PIXEL_SIZE = 32
+        self.EXAMPLE_SIZE = 8
+        # TODO: Seems to use checkpoint even tho this is set to false
         self.RESTORE_CHECKPOINT = False
 
         # ---------- OTHERS ---------- #
@@ -38,7 +41,7 @@ class EmojiGANTraining:
 
         # ---------- CREATE DATASET ----------- #
         reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_SMILING_EMOJIS)
-        images = reader.read_images_from_sheet(pixel=32, debugging=False, png_format='RGB')
+        images = reader.read_images_from_sheet(pixel=self.PIXEL_SIZE, debugging=False, png_format='RGB')
         images = preprocessing.apply_std_preprocessing(images)
 
         self.train_dataset = helper.create_tf_dataset_from_np(images, batch_size=self.BATCH_SIZE)
@@ -47,8 +50,8 @@ class EmojiGANTraining:
 
         # First create a GAN object
         self.emg = EmojiGan(
-            batch_size=self.BATCH_SIZE, noise_dim=self.NOISE_DIM, gen_lr=2e-5,
-            dis_lr=2e-4, restore_ckpt=self.RESTORE_CHECKPOINT, examples=8, loss_func="cross_entropy"
+            batch_size=self.BATCH_SIZE, noise_dim=self.NOISE_DIM, gen_lr=self.GEN_LR,
+            dis_lr=self.DISC_LR, restore_ckpt=self.RESTORE_CHECKPOINT, examples=self.EXAMPLE_SIZE, loss_func="cross_entropy"
         )
         # Add Generator
         self.emg.generator = models.std_generator_model(

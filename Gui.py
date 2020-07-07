@@ -6,6 +6,7 @@ import threading
 
 from utilities.helper import predict_image_pix2pix
 
+
 class Gui(threading.Thread):
 
     def __init__(self, training_instance):
@@ -37,7 +38,9 @@ class Gui(threading.Thread):
         self.training_instance.BATCH_SIZE = int(self.entries[3].get())
         self.training_instance.GEN_LR = float(self.entries[0].get())
         self.training_instance.DISC_LR = float(self.entries[1].get())
-        self.training_instance.RESTORE_CHECKPOINT = self.entries[5].get()
+        self.training_instance.PIXEL_SIZE = int(self.entries[5].get())
+        self.training_instance.EXAMPLE_SIZE = int(self.entries[6].get())
+        self.training_instance.RESTORE_CHECKPOINT = self.entries[7].get()
         self.training_instance.initialize()
 
     def tab3_button_dcgan(self):
@@ -94,8 +97,8 @@ class Gui(threading.Thread):
 
         # Hyperparameter entry widgets
         self.texts = ['Learning Rate Generator', 'Learning Rate Discriminator', 'Noise Dimension', 'Batch Size',
-                      'Iterations', 'Restore Checkpoint']
-        self.texts_defaults = ['2e-4', '2e-5', '100', '64', '1000', 'False']
+                      'Iterations', 'Pixel Size', 'Example Size', 'Restore Checkpoint']
+        self.texts_defaults = ['2e-4', '2e-5', '100', '64', '1000', '32', '8', 'False']
         self.texts_labels = range(len(self.texts))
         self.entries = [Entry(tab1) for t in self.texts]
 
