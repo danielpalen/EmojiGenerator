@@ -116,7 +116,7 @@ class EmojiReader:
         try:
             image_path = os.path.join(image_base_path, image_name)
             image_data = imageio.imread(image_path)
-            #print(image_name, image_data.shape)
+            # print(image_name, image_data.shape)
             return image_data
         except:
             print(
@@ -222,67 +222,66 @@ class EmojiReader:
         assert mode in ["grey", "pix2pix", "normal"]
         assert (not (size != 64 and mode == "pix2pix"))
 
+        PATH = "./emoji-data/traing_images/"
 
-        PATH="./emoji-data/traing_images/"
-
-
-        if (not os.path.isdir(PATH)):
+        if not os.path.isdir(PATH):
             os.makedirs(PATH)
 
-        if (not os.path.isdir(PATH+"h1")):
-            os.makedirs(PATH+"h1")
+        if not os.path.isdir(PATH + "h1"):
+            os.makedirs(PATH + "h1")
 
-        if (not os.path.isdir(PATH+"h2")):
-            os.makedirs(PATH+"h2")
+        if not os.path.isdir(PATH + "h2"):
+            os.makedirs(PATH + "h2")
 
-        if (not os.path.isdir(PATH+"h3")):
-            os.makedirs(PATH+"h3")
+        if not os.path.isdir(PATH + "h3"):
+            os.makedirs(PATH + "h3")
 
-        if (not os.path.isdir(PATH+"h4")):
-            os.makedirs(PATH+"h4")
+        if not os.path.isdir(PATH + "h4"):
+            os.makedirs(PATH + "h4")
 
-        if (not os.path.isdir(PATH+"l1")):
-            os.makedirs(PATH+"l1")
+        if not os.path.isdir(PATH + "l1"):
+            os.makedirs(PATH + "l1")
 
-        if (not os.path.isdir(PATH+"l2")):
-            os.makedirs(PATH+"l2")
+        if not os.path.isdir(PATH + "l2"):
+            os.makedirs(PATH + "l2")
 
-        if (not os.path.isdir(PATH+"l3")):
-            os.makedirs(PATH+"l3")
+        if not os.path.isdir(PATH + "l3"):
+            os.makedirs(PATH + "l3")
 
-        if (not os.path.isdir(PATH+"l4")):
-            os.makedirs(PATH+"l4")
+        if not os.path.isdir(PATH + "l4"):
+            os.makedirs(PATH + "l4")
 
-        if(mode=="pix2pix" and (not os.path.isdir(PATH+"pix2pix"))):
-            os.makedirs(PATH+"pix2pix")
+        if mode == "pix2pix" and (not os.path.isdir(PATH + "pix2pix")):
+            os.makedirs(PATH + "pix2pix")
 
-        if (not os.path.isdir(filepath)):
+        if not os.path.isdir(filepath):
             os.makedirs(filepath)
 
-        if (len([name for name in os.listdir(PATH+'h1') if os.path.isfile(name)])<10):
+        if len([name for name in os.listdir(PATH + 'h1') if os.path.isfile(name)]) < 10:
 
             reader_high = EmojiReader(databases=[f'google'], emoji_names=constants.FACE_EMOJIS_HIGH)
             images_high = reader_high.read_images_from_sheet(pixel=64, debugging=False, png_format='RGB')
 
-            i = 0;
+            i = 0
             for image in images_high:
-                quartering(image, PATH, 'h'+str(i)+".png", True)
-                i+=1
+                quartering(image, PATH, 'h' + str(i) + ".png", True)
+                i += 1
 
             reader_low = EmojiReader(databases=[f'google'], emoji_names=constants.FACE_EMOJIS_LOW)
             images_low = reader_low.read_images_from_sheet(pixel=64, debugging=False, png_format='RGB')
 
-            i=0;
+            i = 0
             for image in images_low:
-                quartering(image, PATH, 'h'+str(i)+".png", False)
-                i+=1
+                quartering(image, PATH, 'h' + str(i) + ".png", False)
+                i += 1
 
-        images=[]
+        images = []
 
         # Neue Emojis zusammensetzen und in final speichern
-        if (len([name for name in os.listdir(filepath) if os.path.isfile(os.path.join(filepath, name))])<number_images):
+        if (len([name for name in os.listdir(filepath) if
+                 os.path.isfile(os.path.join(filepath, name))]) < number_images):
 
-            for x in range(number_images//2):
+            for x in range(number_images // 2):
                 print(str(x))
                 file1 = random.choice(os.listdir(PATH + 'h1\\'))
                 file2 = random.choice(os.listdir(PATH + 'h2\\'))
@@ -303,18 +302,17 @@ class EmojiReader:
                 image_rotate.rotate(random.randint(-5, 5), fillcolor='white')
                 imagefinal = np.array(image_rotate)
 
-                if (size == 32):
-                    imagefinal = imagefinal[::2,::2]
-                if (mode == "grey"):
+                if size == 32:
+                    imagefinal = imagefinal[::2, ::2]
+                if mode == "grey":
                     image_to_grey(imagefinal)
                 images.append(imagefinal)
-                if(not mode=="pix2pix"):
-                    imageio.imwrite(filepath+"h"+ str(x) + '.png', imagefinal)
+                if not mode == "pix2pix":
+                    imageio.imwrite(filepath + "h" + str(x) + '.png', imagefinal)
                 else:
-                    imageio.imwrite(PATH+"pix2pix/"+"h"+ str(x) + '.png', imagefinal)
+                    imageio.imwrite(PATH + "pix2pix/" + "h" + str(x) + '.png', imagefinal)
 
-
-            for x in range(number_images//2):
+            for x in range(number_images // 2):
                 print(str(x))
                 file1 = random.choice(os.listdir(PATH + 'l1/'))
                 file2 = random.choice(os.listdir(PATH + 'l2/'))
@@ -335,24 +333,23 @@ class EmojiReader:
                 image_rotate.rotate(random.randint(-5, 5), fillcolor='white')
                 imagefinal = np.array(image_rotate)
 
-                if(size==32):
-                    imagefinal=imagefinal[::2,::2]
-                if(mode=="grey"):
+                if size == 32:
+                    imagefinal = imagefinal[::2, ::2]
+                if mode == "grey":
                     image_to_grey(imagefinal)
                 images.append(imagefinal)
-                if(not mode=="pix2pix"):
-                    imageio.imwrite(filepath+"l"+ str(x) + '.png', imagefinal)
+                if not mode == "pix2pix":
+                    imageio.imwrite(filepath + "l" + str(x) + '.png', imagefinal)
                 else:
-                    imageio.imwrite(PATH+"pix2pix/"+ str(x) + '.png', imagefinal)
+                    imageio.imwrite(PATH + "pix2pix/" + str(x) + '.png', imagefinal)
 
-
-            if(mode=="pix2pix"):
+            if mode == "pix2pix":
                 # Trainingsdaten erstellen und in Train speichern
-                for file in os.listdir(PATH+"pix2pix/"):
+                for file in os.listdir(PATH + "pix2pix/"):
                     filename = os.fsdecode(file)
                     if filename.endswith(".png"):
-                        image = imageio.imread(PATH+'pix2pix/' + filename)
-                        preProcessing(image,filepath, filename)
+                        image = imageio.imread(PATH + 'pix2pix/' + filename)
+                        preProcessing(image, filepath, filename)
             else:
                 self.images_as_np = np.asarray(images, dtype=np.float32)
                 return self.images_as_np
@@ -365,7 +362,6 @@ class EmojiReader:
                     images.append(imageio.imread(filepath + filename))
             self.images_as_np = np.asarray(images, dtype=np.float32)
             return self.images_as_np
-
 
 
 if __name__ == '__main__':
