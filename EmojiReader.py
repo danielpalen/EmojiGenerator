@@ -89,40 +89,6 @@ class EmojiReader:
         print(f'- {trashed} entries deselected, because not in all sel databases') if in_all_db else ...
         print(f'- {len(self.selected_meta_data)} meta data entries selected.\n')
 
-    def read_images(self, filter=None):  # Filter could be a filter functino to select s
-        # images = [{
-        #     'meta': d,
-        #     'image': self._read_single_image(os.path.join(self.emojis_base_path, 'img-apple-64'), d['image'])
-        # } for d in self.emoji_meta_data]
-
-        # TODO: return as tf.data.DataSet
-
-        images = [
-            self._read_single_image(os.path.join(
-                self.EMOJI_BASE_PATH, 'img-apple-64'), d['image'])
-            for d in self.selected_meta_data
-        ]
-        images = [i for i in images if i is not None]
-        images = np.stack(images, axis=0).astype('float32')
-
-        # TODO: pre processing here.
-
-        images = tf.data.Dataset.from_tensor_slices(images)
-        return images
-
-    def _read_single_image(self, image_base_path, image_name):
-        """Read emoji image and return as np array"""
-        # TODO: is there a more elegant way to do this?
-        try:
-            image_path = os.path.join(image_base_path, image_name)
-            image_data = imageio.imread(image_path)
-            # print(image_name, image_data.shape)
-            return image_data
-        except:
-            print(
-                f'Error: Could not read image {os.path.join(image_base_path, image_name)}')
-            return None
-
     def read_images_from_sheet(self, pixel, png_format=f'RGB', debugging=False):
         """
         This function reads emoji images by utilizing the sheets
