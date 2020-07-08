@@ -4,8 +4,8 @@ from EmojiGANTraining import EmojiGANTraining
 import tensorflow as tf
 
 # Avoid an error occuring on some GPU's when running tensorflow
-# gpu_devices = tf.config.experimental.list_physical_devices('GPU')
-# tf.config.experimental.set_memory_growth(gpu_devices[0], True)
+gpu_devices = tf.config.experimental.list_physical_devices('GPU')
+tf.config.experimental.set_memory_growth(gpu_devices[0], True)
 
 use_gui = True
 
@@ -33,6 +33,7 @@ while True:
         disc_loss_avg = 0
         batch_counter = 0
 
+        # Execute training step for each image batch
         for image_batch in training_instance.train_dataset:
             gen_loss, disc_loss = training_instance.emg.train_step(image_batch)
 
