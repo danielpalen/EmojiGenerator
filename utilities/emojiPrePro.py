@@ -64,5 +64,5 @@ def quartering(image, path, file, is_up):
     else:
         folders = [f'l1', f'l2', f'l3', f'l4']
 
-    for f in folders:
+    for f in folders:dfd
         imageio.imwrite(path + f + os.sep + file, Image.fromarray(image[:33, :33].astype(np.uint8)))
