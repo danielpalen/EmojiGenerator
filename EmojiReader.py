@@ -108,13 +108,13 @@ class EmojiReader:
             shutil.rmtree('output/selected_emoji/')
             os.mkdir(f'output/selected_emoji/')
 
-        # Collect all emoji images
+        # Collects all emoji images
         images = []
 
         for db in self.databases:
             im_path = f'emoji-data/sheet_{db}_{pixel}.png'
 
-            # Images are  as RGBA
+            # Images are as RGBA
             if png_format == f'RGBA':
                 # Because the RGB values are random at places where
                 # alpha == 0, we set it manually to white
@@ -188,34 +188,15 @@ class EmojiReader:
         assert mode in ["grey", "pix2pix", "normal"]
         assert (not (size != 64 and mode == "pix2pix"))
 
-        PATH = "./emoji-data/traing_images/"
+        PATH = "./emoji-data/training_images/"
 
         if not os.path.isdir(PATH):
             os.makedirs(PATH)
 
-        if not os.path.isdir(PATH + "h1"):
-            os.makedirs(PATH + "h1")
-
-        if not os.path.isdir(PATH + "h2"):
-            os.makedirs(PATH + "h2")
-
-        if not os.path.isdir(PATH + "h3"):
-            os.makedirs(PATH + "h3")
-
-        if not os.path.isdir(PATH + "h4"):
-            os.makedirs(PATH + "h4")
-
-        if not os.path.isdir(PATH + "l1"):
-            os.makedirs(PATH + "l1")
-
-        if not os.path.isdir(PATH + "l2"):
-            os.makedirs(PATH + "l2")
-
-        if not os.path.isdir(PATH + "l3"):
-            os.makedirs(PATH + "l3")
-
-        if not os.path.isdir(PATH + "l4"):
-            os.makedirs(PATH + "l4")
+        folders = [f'h1', f'h2', f'h3', f'h4', f'l1', f'l2', f'l3', f'l4']
+        for f in folders:
+            if not os.path.isdir(PATH + f):
+                os.makedirs(PATH + f)
 
         if mode == "pix2pix" and (not os.path.isdir(PATH + "pix2pix")):
             os.makedirs(PATH + "pix2pix")
@@ -228,27 +209,24 @@ class EmojiReader:
             reader_high = EmojiReader(databases=[f'google'], emoji_names=constants.FACE_EMOJIS_HIGH)
             images_high = reader_high.read_images_from_sheet(pixel=64, debugging=False, png_format='RGB')
 
-            i = 0
-            for image in images_high:
+            for i, image in enumerate(images_high):
                 quartering(image, PATH, 'h' + str(i) + ".png", True)
-                i += 1
 
             reader_low = EmojiReader(databases=[f'google'], emoji_names=constants.FACE_EMOJIS_LOW)
             images_low = reader_low.read_images_from_sheet(pixel=64, debugging=False, png_format='RGB')
 
-            i = 0
-            for image in images_low:
+            for i, image in enumerate(images_low):
                 quartering(image, PATH, 'h' + str(i) + ".png", False)
-                i += 1
 
         images = []
 
-        # Neue Emojis zusammensetzen und in final speichern
+        # Create new emojis and save in "final"
         if (len([name for name in os.listdir(filepath) if
                  os.path.isfile(os.path.join(filepath, name))]) < number_images):
 
             for x in range(number_images // 2):
                 print(str(x))
+
                 file1 = random.choice(os.listdir(PATH + 'h1\\'))
                 file2 = random.choice(os.listdir(PATH + 'h2\\'))
                 file3 = random.choice(os.listdir(PATH + 'h3\\'))
@@ -261,23 +239,23 @@ class EmojiReader:
                 image2 = imageio.imread(PATH + 'h2\\' + filename2)
                 image3 = imageio.imread(PATH + 'h3\\' + filename3)
                 image4 = imageio.imread(PATH + 'h4\\' + filename4)
-                imagefinal = np.concatenate(
+                image_concat = np.concatenate(
                     (np.concatenate((image1, image2), axis=1), np.concatenate((image3, image4), axis=1)), axis=0)
 
-                image_rotate = Image.fromarray(imagefinal)
+                image_rotate = Image.fromarray(image_concat)
                 image_rotate.rotate(random.randint(-5, 5), fillcolor='white')
-                imagefinal = np.array(image_rotate)
+                image_final = np.array(image_rotate)
 
                 if size == 32:
-                    imagefinal = imagefinal[::2, ::2]
+                    image_final = image_final[::2, ::2]
                 if mode == "grey":
-                    image_to_grey(imagefinal)
-                images.append(imagefinal)
+                    image_to_grey(image_final)
+                images.append(image_final)
 
                 if not mode == "pix2pix":
-                    imageio.imwrite(filepath + "h" + str(x) + '.png', imagefinal)
+                    imageio.imwrite(filepath + "h" + str(x) + '.png', image_final)
                 else:
-                    imageio.imwrite(PATH + "pix2pix/" + "h" + str(x) + '.png', imagefinal)
+                    imageio.imwrite(PATH + "pix2pix/" + "h" + str(x) + '.png', image_final)
 
             for x in range(number_images // 2):
                 print(str(x))
@@ -312,7 +290,7 @@ class EmojiReader:
                     imageio.imwrite(PATH + "pix2pix/" + str(x) + '.png', imagefinal)
 
             if mode == "pix2pix":
-                # Trainingsdaten erstellen und in Train speichern
+                # Create training data and save in "train"
                 for file in os.listdir(PATH + "pix2pix/"):
                     filename = os.fsdecode(file)
                     if filename.endswith(".png"):
