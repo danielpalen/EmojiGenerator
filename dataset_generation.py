@@ -4,7 +4,7 @@ from utilities import constants
 from utilities.emojiPrePro import *
 
 
-def generate_training_images(self, filepath, number_images=1000, size=32, mode="grey"):
+def generate_training_images(filepath=f'training_data', number_images=1000, size=32, mode="grey"):
     """
     Creates training images for DCGAN and Pix2Pix. Returns them like the function
     'read_images_from_sheet' and saves them in a folder if there is
@@ -22,7 +22,7 @@ def generate_training_images(self, filepath, number_images=1000, size=32, mode="
     assert mode in ["grey", "pix2pix", "normal"]
     assert (not (size != 64 and mode == "pix2pix"))
 
-    PATH = "./emoji-data/training_images/"
+    PATH = "./output/training_preprocessing/"
 
     if not os.path.isdir(PATH):
         os.makedirs(PATH)
@@ -50,7 +50,7 @@ def generate_training_images(self, filepath, number_images=1000, size=32, mode="
         images_low = reader_low.read_images_from_sheet(pixel=64, debugging=False, png_format='RGB')
 
         for i, image in enumerate(images_low):
-            quartering(image, PATH, 'h' + str(i) + ".png", False)
+            quartering(image, PATH, 'l' + str(i) + ".png", False)
 
     images = []
 
@@ -65,9 +65,9 @@ def generate_training_images(self, filepath, number_images=1000, size=32, mode="
             for pos in [f'h', f'l']:
                 rand_images = []
                 for i in range(1, 5):
-                    _file = random.choice(os.listdir(PATH + pos + str(i) + f'\\'))
+                    _file = random.choice(os.listdir(PATH + pos + str(i) + os.sep))
                     _filename = os.fsdecode(_file)
-                    rand_images.append(imageio.imread(PATH + pos + str(i) + f'\\' + _filename))
+                    rand_images.append(imageio.imread(PATH + pos + str(i) + os.sep + _filename))
 
                 image_concat = np.concatenate(
                     (np.concatenate((rand_images[0], rand_images[1]), axis=1),
@@ -98,8 +98,7 @@ def generate_training_images(self, filepath, number_images=1000, size=32, mode="
                     image = imageio.imread(PATH + 'pix2pix/' + filename)
                     preProcessing(image, filepath, filename)
         else:
-            self.images_as_np = np.asarray(images, dtype=np.float32)
-            return self.images_as_np
+            return np.asarray(images, dtype=np.float32)
 
     else:
         images = []
@@ -107,5 +106,6 @@ def generate_training_images(self, filepath, number_images=1000, size=32, mode="
             filename = os.fsdecode(file)
             if filename.endswith(".jpg"):
                 images.append(imageio.imread(filepath + filename))
-        self.images_as_np = np.asarray(images, dtype=np.float32)
-        return self.images_as_np
+        return np.asarray(images, dtype=np.float32)
+
+generate_training_images()
