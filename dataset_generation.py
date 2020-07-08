@@ -2,6 +2,7 @@ import os
 from EmojiReader import EmojiReader
 from utilities import constants
 from utilities.emojiPrePro import *
+from tqdm import tqdm
 
 
 def generate_training_images(filepath=f'output/training_images', number_images=1000, size=32, mode="grey"):
@@ -57,11 +58,15 @@ def generate_training_images(filepath=f'output/training_images', number_images=1
     images = []
 
     # Create new emojis and save in "final"
+    # Each emoji is constructed from 4 quater emojis
+    # that we cut and saved in the last step
     if (len([name for name in os.listdir(filepath) if
              os.path.isfile(os.path.join(filepath, name))]) < number_images):
 
-        for x in range(number_images // 2):
-            print(str(x))
+        print(f'Generate training images in {filepath}!')
+
+        for x in tqdm(range(number_images // 2)):
+
 
             # Create pictures cut from top (high) and bottom (low) half of the image
             for pos in [f'h', f'l']:
@@ -88,7 +93,6 @@ def generate_training_images(filepath=f'output/training_images', number_images=1
                 images.append(image_final)
 
                 if not mode == "pix2pix":
-                    print(filepath + pos + str(x) + '.png')
                     imageio.imwrite(filepath + os.sep + pos + str(x) + '.png', image_final)
                 else:
                     imageio.imwrite(PATH + "pix2pix/" + pos + str(x) + '.png', image_final)
@@ -104,11 +108,8 @@ def generate_training_images(filepath=f'output/training_images', number_images=1
             return np.asarray(images, dtype=np.float32)
 
     else:
-        images = []
-        for file in os.listdir(filepath):
+        print(f'Loading already created training data from {filepath} ')
+        for file in tqdm(os.listdir(filepath)):
             filename = os.fsdecode(file)
-            if filename.endswith(".jpg"):
-                images.append(imageio.imread(filepath + filename))
+            images.append(imageio.imread(filepath + os.sep + filename))
         return np.asarray(images, dtype=np.float32)
-
-generate_training_images()
