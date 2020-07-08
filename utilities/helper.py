@@ -1,6 +1,6 @@
 import imageio
 import tensorflow as tf
-from pandas import np
+import numpy as np
 from matplotlib import pyplot as plt
 
 
