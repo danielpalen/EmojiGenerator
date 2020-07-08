@@ -19,7 +19,7 @@ else:
 
 # Main gui loop
 while True:
-    
+
     # Sleep while training instance is not initialized and not ready for training
     while ((not training_instance.initialization_flag) or (not training_instance.training_flag)) and use_gui:
         time.sleep(0.01)
@@ -71,3 +71,7 @@ while True:
     print(f'\nTRAINING FINISHED (Time: {format(time.time() - training_instance.train_time, ".2f")} sec)')
 
     # gif.create_gif(f'output/images/image*.png', f'output/emojigan.gif')
+
+    # Exit gui while loop if no gui used
+    if not use_gui:
+        break

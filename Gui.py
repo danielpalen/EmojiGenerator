@@ -58,7 +58,7 @@ class Gui(threading.Thread):
         """
         # TODO: Call sample method of self.training_instance here
         plt.figure()
-        plt.imshow(self.training_instance.emg.sample(x=np.random.rand(10)))
+        plt.imshow(self.training_instance.sample(x=np.random.rand(10)))
         plt.show()
         return None
 
