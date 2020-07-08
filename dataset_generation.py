@@ -4,7 +4,7 @@ from utilities import constants
 from utilities.emojiPrePro import *
 
 
-def generate_training_images(filepath=f'training_data', number_images=1000, size=32, mode="grey"):
+def generate_training_images(filepath=f'output/training_images', number_images=1000, size=32, mode="grey"):
     """
     Creates training images for DCGAN and Pix2Pix. Returns them like the function
     'read_images_from_sheet' and saves them in a folder if there is
@@ -22,7 +22,7 @@ def generate_training_images(filepath=f'training_data', number_images=1000, size
     assert mode in ["grey", "pix2pix", "normal"]
     assert (not (size != 64 and mode == "pix2pix"))
 
-    PATH = "./output/training_preprocessing/"
+    PATH = "./output/data_augmentation/"
 
     if not os.path.isdir(PATH):
         os.makedirs(PATH)
@@ -38,6 +38,8 @@ def generate_training_images(filepath=f'training_data', number_images=1000, size
     if not os.path.isdir(filepath):
         os.makedirs(filepath)
 
+    # Cutting out a quarter emoji and saving it in different folders
+    # Either of the high or low part of the emoji
     if len([name for name in os.listdir(PATH + 'h1') if os.path.isfile(name)]) < 10:
 
         reader_high = EmojiReader(databases=[f'google'], emoji_names=constants.FACE_EMOJIS_HIGH)
@@ -86,7 +88,8 @@ def generate_training_images(filepath=f'training_data', number_images=1000, size
                 images.append(image_final)
 
                 if not mode == "pix2pix":
-                    imageio.imwrite(filepath + pos + str(x) + '.png', image_final)
+                    print(filepath + pos + str(x) + '.png')
+                    imageio.imwrite(filepath + os.sep + pos + str(x) + '.png', image_final)
                 else:
                     imageio.imwrite(PATH + "pix2pix/" + pos + str(x) + '.png', image_final)
 
