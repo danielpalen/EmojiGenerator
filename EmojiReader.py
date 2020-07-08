@@ -227,67 +227,34 @@ class EmojiReader:
             for x in range(number_images // 2):
                 print(str(x))
 
-                file1 = random.choice(os.listdir(PATH + 'h1\\'))
-                file2 = random.choice(os.listdir(PATH + 'h2\\'))
-                file3 = random.choice(os.listdir(PATH + 'h3\\'))
-                file4 = random.choice(os.listdir(PATH + 'h4\\'))
-                filename1 = os.fsdecode(file1)
-                filename2 = os.fsdecode(file2)
-                filename3 = os.fsdecode(file3)
-                filename4 = os.fsdecode(file4)
-                image1 = imageio.imread(PATH + 'h1\\' + filename1)
-                image2 = imageio.imread(PATH + 'h2\\' + filename2)
-                image3 = imageio.imread(PATH + 'h3\\' + filename3)
-                image4 = imageio.imread(PATH + 'h4\\' + filename4)
-                image_concat = np.concatenate(
-                    (np.concatenate((image1, image2), axis=1), np.concatenate((image3, image4), axis=1)), axis=0)
+                # Create pictures cut from top (high) and bottom (low) half of the image
+                for pos in [f'h', f'l']:
+                    rand_images = []
+                    for i in range(1,5):
+                        _file = random.choice(os.listdir(PATH + pos + str(i) + f'\\'))
+                        _filename = os.fsdecode(_file)
+                        rand_images.append(imageio.imread(PATH + pos + str(i) + f'\\' + _filename))
 
-                image_rotate = Image.fromarray(image_concat)
-                image_rotate.rotate(random.randint(-5, 5), fillcolor='white')
-                image_final = np.array(image_rotate)
+                    image_concat = np.concatenate(
+                        (np.concatenate((rand_images[0], rand_images[1]), axis=1),
+                         np.concatenate((rand_images[2], rand_images[3]), axis=1)),
+                        axis=0)
 
-                if size == 32:
-                    image_final = image_final[::2, ::2]
-                if mode == "grey":
-                    image_to_grey(image_final)
-                images.append(image_final)
+                    image_rotate = Image.fromarray(image_concat)
+                    image_rotate.rotate(random.randint(-5, 5), fillcolor='white')
+                    image_final = np.array(image_rotate)
 
-                if not mode == "pix2pix":
-                    imageio.imwrite(filepath + "h" + str(x) + '.png', image_final)
-                else:
-                    imageio.imwrite(PATH + "pix2pix/" + "h" + str(x) + '.png', image_final)
+                    if size == 32:
+                        image_final = image_final[::2, ::2]
+                    if mode == "grey":
+                        image_to_grey(image_final)
 
-            for x in range(number_images // 2):
-                print(str(x))
-                file1 = random.choice(os.listdir(PATH + 'l1/'))
-                file2 = random.choice(os.listdir(PATH + 'l2/'))
-                file3 = random.choice(os.listdir(PATH + 'l3/'))
-                file4 = random.choice(os.listdir(PATH + 'l4/'))
-                filename1 = os.fsdecode(file1)
-                filename2 = os.fsdecode(file2)
-                filename3 = os.fsdecode(file3)
-                filename4 = os.fsdecode(file4)
-                image1 = imageio.imread(PATH + 'l1/' + filename1)
-                image2 = imageio.imread(PATH + 'l2/' + filename2)
-                image3 = imageio.imread(PATH + 'l3/' + filename3)
-                image4 = imageio.imread(PATH + 'l4/' + filename4)
-                imagefinal = np.concatenate(
-                    (np.concatenate((image1, image2), axis=1), np.concatenate((image3, image4), axis=1)), axis=0)
+                    images.append(image_final)
 
-                image_rotate = Image.fromarray(imagefinal)
-                image_rotate.rotate(random.randint(-5, 5), fillcolor='white')
-                imagefinal = np.array(image_rotate)
-
-                if size == 32:
-                    imagefinal = imagefinal[::2, ::2]
-                if mode == "grey":
-                    image_to_grey(imagefinal)
-                images.append(imagefinal)
-
-                if not mode == "pix2pix":
-                    imageio.imwrite(filepath + "l" + str(x) + '.png', imagefinal)
-                else:
-                    imageio.imwrite(PATH + "pix2pix/" + str(x) + '.png', imagefinal)
+                    if not mode == "pix2pix":
+                        imageio.imwrite(filepath + pos + str(x) + '.png', image_final)
+                    else:
+                        imageio.imwrite(PATH + "pix2pix/" + pos + str(x) + '.png', image_final)
 
             if mode == "pix2pix":
                 # Create training data and save in "train"
