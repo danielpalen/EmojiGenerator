@@ -8,6 +8,7 @@ from EmojiReader import EmojiReader
 from utilities import constants
 from utilities import helper
 import preprocessing
+import dataset_generation
 
 
 class EmojiGANTraining:
@@ -41,8 +42,15 @@ class EmojiGANTraining:
         """
 
         # ---------- CREATE DATASET ----------- #
-        reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_SMILING_EMOJIS)
-        images = reader.read_images_from_sheet(pixel=self.PIXEL_SIZE, debugging=False, png_format='RGB')
+        # At the moment we use 3 chanel images that are black and white
+        black_and_white = True
+
+        if black_and_white:
+            images = dataset_generation.generate_training_images()
+        else:
+            reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_SMILING_EMOJIS)
+            images = reader.read_images_from_sheet(pixel=self.PIXEL_SIZE, debugging=False, png_format='RGB')
+
         images = preprocessing.apply_std_preprocessing(images)
 
         self.train_dataset = helper.create_tf_dataset_from_np(images, batch_size=self.BATCH_SIZE)
