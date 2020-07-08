@@ -4,6 +4,7 @@ import random
 import numpy as np
 
 from PIL import Image
+import os
 
 
 def colorChanger(x):
@@ -57,13 +58,11 @@ def preProcessing(image, path, file):
 
 
 def quartering(image, path, file, is_up):
-    if (is_up):
-        imageio.imwrite(path + 'h1' + '\\' + file, Image.fromarray(image[:33, :33].astype(np.uint8)))
-        imageio.imwrite(path + 'h2' + '\\' + file, Image.fromarray(image[:33, 33:].astype(np.uint8)))
-        imageio.imwrite(path + 'h3' + '\\' + file, Image.fromarray(image[33:, :33].astype(np.uint8)))
-        imageio.imwrite(path + 'h4' + '\\' + file, Image.fromarray(image[33:, 33:].astype(np.uint8)))
+    # Choose the folders for the low or high part of an image
+    if is_up:
+        folders = [f'h1', f'h2', f'h3', f'h4']
     else:
-        imageio.imwrite(path + 'l1' + '\\' + file, Image.fromarray(image[:38, :33].astype(np.uint8)))
-        imageio.imwrite(path + 'l2' + '\\' + file, Image.fromarray(image[:38, 33:].astype(np.uint8)))
-        imageio.imwrite(path + 'l3' + '\\' + file, Image.fromarray(image[38:, :33].astype(np.uint8)))
-        imageio.imwrite(path + 'l4' + '\\' + file, Image.fromarray(image[38:, 33:].astype(np.uint8)))
+        folders = [f'l1', f'l2', f'l3', f'l4']
+
+    for f in folders:
+        imageio.imwrite(path + f + os.sep + file, Image.fromarray(image[:33, :33].astype(np.uint8)))
