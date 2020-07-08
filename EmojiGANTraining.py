@@ -51,7 +51,7 @@ class EmojiGANTraining:
         # First create a GAN object
         self.emg = EmojiGan(
             batch_size=self.BATCH_SIZE, noise_dim=self.NOISE_DIM, gen_lr=self.GEN_LR,
-            dis_lr=self.DISC_LR, restore_ckpt=self.RESTORE_CHECKPOINT, examples=self.EXAMPLE_SIZE, loss_func="cross_entropy"
+            dis_lr=self.DISC_LR, restore_ckpt=self.RESTORE_CHECKPOINT, examples=self.EXAMPLE_SIZE
         )
         # Add Generator
         self.emg.generator = models.std_generator_model(
