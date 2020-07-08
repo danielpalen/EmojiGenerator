@@ -1,5 +1,7 @@
 import imageio
 import tensorflow as tf
+from pandas import np
+from matplotlib import pyplot as plt
 
 
 def create_tf_dataset_from_np(images, batch_size):
@@ -65,13 +67,22 @@ def predict_image_pix2pix(image, model_path):
     generator = tf.keras.models.load_model(model_path)
 
     images=[]
-    images.append(imageio.imread(image))
-    train_dataset = tf.data.Dataset.from_tensor_slices(images)
 
+    width = image.shape[0]
+    if (width == 32):
+        image = np.repeat(np.repeat(image, 8, axis=0), 8, axis=1)
+
+    images.append(image)
+
+    train_dataset = tf.data.Dataset.from_tensor_slices(images)
     train_dataset = train_dataset.map(load_image)
     train_dataset = train_dataset.batch(1)
 
     for inp, tar in train_dataset.take(1):
         prediction =generator(inp,training=True)
+        plt.imshow(prediction[0])
+        plt.axis('off')
+        plt.show()
+
         return prediction[0]
 

@@ -309,7 +309,7 @@ class EmojiReader:
                     image_to_grey(imagefinal)
                 images.append(imagefinal)
                 if(not mode=="pix2pix"):
-                    imageio.imwrite(filepath+"h"+ str(x) + '.png', imagefinal)
+                    imageio.imwrite(filepath+"h"+ str(x) + '.jpg', imagefinal)
                 else:
                     imageio.imwrite(PATH+"pix2pix/"+"h"+ str(x) + '.png', imagefinal)
 
@@ -341,7 +341,7 @@ class EmojiReader:
                     image_to_grey(imagefinal)
                 images.append(imagefinal)
                 if(not mode=="pix2pix"):
-                    imageio.imwrite(filepath+"l"+ str(x) + '.png', imagefinal)
+                    imageio.imwrite(filepath+"l"+ str(x) + '.jpg', imagefinal)
                 else:
                     imageio.imwrite(PATH+"pix2pix/"+ str(x) + '.png', imagefinal)
 
@@ -361,7 +361,7 @@ class EmojiReader:
             images = []
             for file in os.listdir(filepath):
                 filename = os.fsdecode(file)
-                if filename.endswith(".png"):
+                if filename.endswith(".jpg"):
                     images.append(imageio.imread(filepath + filename))
             self.images_as_np = np.asarray(images, dtype=np.float32)
             return self.images_as_np
