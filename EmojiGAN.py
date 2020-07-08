@@ -25,8 +25,6 @@ class EmojiGan:
         self.generator_optimizer = tf.keras.optimizers.Adam(gen_lr)
         self.discriminator_optimizer = tf.keras.optimizers.Adam(dis_lr)
 
-        self.gui = None
-
         # ----- EXAMPLES ----- #
         # We reuse the same seed over time
         # -> Easier to visualize progress
@@ -70,7 +68,7 @@ class EmojiGan:
         return gen_loss, disc_loss
 
     @staticmethod
-    def generate_and_save_images(model, epoch, test_input, canvas_update):
+    def generate_and_save_images(model, epoch, test_input):
         # 'Training' = False, so net runs in inference mode (batchnorm)
         predictions = model(test_input, training=False)
 
@@ -86,11 +84,3 @@ class EmojiGan:
             plt.close(fig)
 
         plt.savefig('output/images/image_at_epoch_{:04d}.png'.format(epoch))
-        if canvas_update is not None:
-            print(type(canvas_update))
-            print(type(canvas_update[0]))
-            print(type(canvas_update[1]))
-            if epoch % 10 == 0:
-                img = PhotoImage(file='output/images/image_at_epoch_{:04d}.png'.format(epoch))
-                canvas_update[0].after(1, canvas_update[0].itemconfig(canvas_update[1], image=img))
-                print("Canvas updated.")

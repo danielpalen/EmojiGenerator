@@ -3,6 +3,11 @@ from tkinter import ttk
 import random
 import os
 import threading
+import scipy.misc
+import matplotlib.pyplot as plt
+import numpy as np
+import imageio
+from PIL import Image
 
 from utilities.helper import predict_image_pix2pix
 
@@ -43,20 +48,41 @@ class Gui(threading.Thread):
         self.training_instance.RESTORE_CHECKPOINT = self.entries[7].get()
         self.training_instance.initialize()
 
+    def tab2_button_func(self):
+        """
+            Defines what happens after pressing the button in tab 2.
+            Sets training flag to true / false to start or stop the training loop.
+        """
+        self.training_instance.training_flag = not self.training_instance.training_flag
+
     def tab3_button_dcgan(self):
         """
-            Defines what happens when pressing the above button in tab3.
+            Defines what happens when pressing the above button in tab 3.
+            Samples from DCGAN, then saves sample to .png
+            Then displays .png in greyscale.
         """
         # TODO: Call sample method of self.training_instance here
-        None
+        sample_img = self.training_instance.sample().squeeze()
+        pil_img = Image.fromarray(sample_img, 'RGB')
+        pil_img.save('sample_file.png')
+        tkinter_img = PhotoImage(file='sample_file.png')
+        self.sample_image_canvas.itemconfig(self.image_on_sample_canvas, image=tkinter_img)
 
     def tab3_button_pix2pix(self):
         """
-            Defines what happens when pressing the below button in tab3.
+            Defines what happens when pressing the below button in tab 3.
+
+            Reads current image from tab3 image canvas and puts it in the pix2pix generator.
+            Then displays the result in the image canvas.
         """
         # TODO: Define input image correctly
-        img = PhotoImage(file=predict_image_pix2pix(image='image_at_epoch_0001.png', model_path='pix2pix_model.h5'))
-        self.sample_image_canvas.itemconfig(self.image_on_sample_canvas, image=img)
+
+        img = imageio.imread('sample_file.png')
+        prediction = predict_image_pix2pix(image=img, model_path='pix2pix_model.h5').numpy()
+        pil_img = Image.fromarray(prediction, 'RGB')
+        pil_img.save('pix2pix_sample_file.png')
+        # img = PhotoImage(file=prediction)
+        # self.sample_image_canvas.itemconfig(self.image_on_sample_canvas, image=img)
         self.root.update()
 
     def image_canvas_update_1(self, path, progress_text_update):
@@ -121,14 +147,18 @@ class Gui(threading.Thread):
                                          y=150 - self.training_image_canvas.winfo_height() / 2)
         self.image_on_training_canvas = self.training_image_canvas.create_image(250, 250, image=None)
 
+        # Initialization button
+        Button(tab1, text='initialize', command=self.tab1_button_func,
+               width=40).place(x=150, y=30 + (len(self.texts_labels) + 1)*60)
+
         # Training button
-        Button(tab2, text='Run training', command=self.tab1_button_func, width=20).place(x=200, y=50)
+        Button(tab2, text='Run training', command=self.tab2_button_func, width=20).place(x=200, y=50)
         progress_label = Label(tab2, text='Progress:').place(x=200, y=100)
         self.progress_text = Text(tab2, height=1, width=15)
         self.progress_text.place(x=275, y=100)
 
         # DCGAN sample button
-        Button(tab3, text='Sample DCGAN', command=..., width=40).place(x=150, y=50)
+        Button(tab3, text='Sample DCGAN', command=self.tab3_button_dcgan, width=40).place(x=150, y=50)
 
         # Pix2Pix sample button
         Button(tab3, text='Convert by Pix2Pix', command=self.tab3_button_pix2pix, width=40).place(x=150, y=100)
@@ -137,6 +167,7 @@ class Gui(threading.Thread):
         self.sample_image_canvas.pack()
         self.sample_image_canvas.place(x=50 - self.training_image_canvas.winfo_width() / 2,
                                        y=150 - self.training_image_canvas.winfo_height() / 2)
+
         self.image_on_sample_canvas = self.sample_image_canvas.create_image(250, 250, image=None)
 
         # Update gui
