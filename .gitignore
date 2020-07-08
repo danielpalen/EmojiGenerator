@@ -21,3 +21,6 @@ output/
 # Ignore data ordner
 data/
 emoji-data/
+
+# Models
+*.h5
