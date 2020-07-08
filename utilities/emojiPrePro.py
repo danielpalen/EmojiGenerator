@@ -58,11 +58,13 @@ def preProcessing(image, path, file):
 
 
 def quartering(image, path, file, is_up):
-    # Choose the folders for the low or high part of an image
-    if is_up:
-        folders = [f'h1', f'h2', f'h3', f'h4']
+    if (is_up):
+        imageio.imwrite(path + 'h1' + os.sep + file, Image.fromarray(image[:33, :33].astype(np.uint8)))
+        imageio.imwrite(path + 'h2' + os.sep + file, Image.fromarray(image[:33, 33:].astype(np.uint8)))
+        imageio.imwrite(path + 'h3' + os.sep + file, Image.fromarray(image[33:, :33].astype(np.uint8)))
+        imageio.imwrite(path + 'h4' + os.sep + file, Image.fromarray(image[33:, 33:].astype(np.uint8)))
     else:
-        folders = [f'l1', f'l2', f'l3', f'l4']
-
-    for f in folders:dfd
-        imageio.imwrite(path + f + os.sep + file, Image.fromarray(image[:33, :33].astype(np.uint8)))
+        imageio.imwrite(path + 'l1' + os.sep + file, Image.fromarray(image[:38, :33].astype(np.uint8)))
+        imageio.imwrite(path + 'l2' + os.sep + file, Image.fromarray(image[:38, 33:].astype(np.uint8)))
+        imageio.imwrite(path + 'l3' + os.sep + file, Image.fromarray(image[38:, :33].astype(np.uint8)))
+        imageio.imwrite(path + 'l4' + os.sep + file, Image.fromarray(image[38:, 33:].astype(np.uint8)))
