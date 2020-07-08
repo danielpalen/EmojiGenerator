@@ -77,8 +77,12 @@ class Gui(threading.Thread):
         """
         # TODO: Define input image correctly
 
-        img = PhotoImage(file=predict_image_pix2pix(image='image_at_epoch_0001.png', model_path='pix2pix_model.h5'))
-        self.sample_image_canvas.itemconfig(self.image_on_sample_canvas, image=img)
+        img = imageio.imread('sample_file.png')
+        prediction = predict_image_pix2pix(image=img, model_path='pix2pix_model.h5').numpy()
+        pil_img = Image.fromarray(prediction, 'RGB')
+        pil_img.save('pix2pix_sample_file.png')
+        # img = PhotoImage(file=prediction)
+        # self.sample_image_canvas.itemconfig(self.image_on_sample_canvas, image=img)
         self.root.update()
 
     def image_canvas_update_1(self, path, progress_text_update):
