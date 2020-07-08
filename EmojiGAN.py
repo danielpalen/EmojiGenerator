@@ -81,6 +81,7 @@ class EmojiGan:
             plt.subplot(4, 4, i + 1)
             plt.imshow(im)
             plt.axis('off')
-            plt.close(fig)
 
         plt.savefig('output/images/image_at_epoch_{:04d}.png'.format(epoch))
+        plt.close(fig)
+
