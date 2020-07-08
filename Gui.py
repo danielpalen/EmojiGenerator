@@ -3,8 +3,11 @@ from tkinter import ttk
 import random
 import os
 import threading
+import scipy.misc
 import matplotlib.pyplot as plt
 import numpy as np
+import imageio
+from PIL import Image
 
 from utilities.helper import predict_image_pix2pix
 
@@ -55,12 +58,15 @@ class Gui(threading.Thread):
     def tab3_button_dcgan(self):
         """
             Defines what happens when pressing the above button in tab 3.
+            Samples from DCGAN, then saves sample to .png
+            Then displays .png in greyscale.
         """
         # TODO: Call sample method of self.training_instance here
-        plt.figure()
-        plt.imshow(self.training_instance.sample(x=np.random.rand(10)))
-        plt.show()
-        return None
+        sample_img = self.training_instance.sample().squeeze()
+        pil_img = Image.fromarray(sample_img, 'RGB')
+        pil_img.save('sample_file.png')
+        tkinter_img = PhotoImage(file='sample_file.png')
+        self.sample_image_canvas.itemconfig(self.image_on_sample_canvas, image=tkinter_img)
 
     def tab3_button_pix2pix(self):
         """
@@ -157,6 +163,7 @@ class Gui(threading.Thread):
         self.sample_image_canvas.pack()
         self.sample_image_canvas.place(x=50 - self.training_image_canvas.winfo_width() / 2,
                                        y=150 - self.training_image_canvas.winfo_height() / 2)
+
         self.image_on_sample_canvas = self.sample_image_canvas.create_image(250, 250, image=None)
 
         # Update gui

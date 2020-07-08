@@ -2,6 +2,7 @@ import os
 import models
 import time
 import tensorflow as tf
+import numpy as np
 from EmojiGAN import EmojiGan
 from EmojiReader import EmojiReader
 from utilities import constants
@@ -94,6 +95,12 @@ class EmojiGANTraining:
             Generates a sample from the DCGAN architecture using the last checkpoint from output/checkpoints.
 
         """
-
+        self.RESTORE_CHECKPOINT = True
+        self.initialize()
+        noise = tf.random.normal([1, self.NOISE_DIM])
+        sample = self.emg.generator(noise, training=False).numpy()
+        self.RESTORE_CHECKPOINT = False
+        self.initialization_flag = False
+        return sample
 
 
