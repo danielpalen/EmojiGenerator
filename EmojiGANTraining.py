@@ -11,7 +11,7 @@ import preprocessing
 
 class EmojiGANTraining:
 
-    def __init__(self, canvas_update=None):
+    def __init__(self):
         # ---------- HYPERPARAMETERS ---------- #
         self.NOISE_DIM = 100
         self.EPOCHS = 2000
@@ -25,10 +25,10 @@ class EmojiGANTraining:
 
         # ---------- OTHERS ---------- #
         self.initialization_flag = False
+        self.training_flag = False
         self.train_time = None
         self.train_dataset = None
         self.emg = None
-        self.canvas_update = canvas_update
         self.checkpoint = None
         self.checkpoint_prefix = None
 
@@ -89,8 +89,11 @@ class EmojiGANTraining:
         # can be exited.
         self.initialization_flag = True
 
+    def sample(self):
+        """
+            Generates a sample from the DCGAN architecture using the last checkpoint from output/checkpoints.
 
-
+        """
 
 
 
