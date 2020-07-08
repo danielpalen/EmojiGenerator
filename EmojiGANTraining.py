@@ -68,9 +68,6 @@ class EmojiGANTraining:
         if not self.emg.generator or not self.emg.discriminator:
             raise RuntimeError(f'The generator and discriminator have to be set before training.')
 
-        # TODO: check if dataset has tf.float32 datatype
-        # raise TypeError(f'Please convert dataset to float before preprocessing.')
-
         # ----- CKPT CONFIG ----- #
         if not os.path.exists(f'output/checkpoints/'):
             os.mkdir(f'output/checkpoints/')
@@ -87,6 +84,9 @@ class EmojiGANTraining:
 
         self.train_time = time.time()
 
+        # After initialization, this variable is set to True, so
+        # the while loop of the GUI that waits for the user input
+        # can be exited.
         self.initialization_flag = True
 
 

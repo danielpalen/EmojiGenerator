@@ -11,24 +11,19 @@ class EmojiGan:
     adversarial network to learn generating emoji.
     """
     def __init__(self, batch_size=256, noise_dim=100, gen_lr=1e-4,
-                 dis_lr=1e-4, restore_ckpt=False, examples=16, loss_func="cross_entropy"):
+                 dis_lr=1e-4, restore_ckpt=False, examples=16):
         self.BATCH_SIZE = batch_size
         self.NOISE_DIM = noise_dim
         self.RESTORE_CKPT = restore_ckpt
         self.EXAMPLES = examples
-        self.LOSS = loss_func
 
         self.generator = None
         self.discriminator = None
 
         self.cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
-        if self.LOSS == "cross_entropy":
-            self.generator_optimizer = tf.keras.optimizers.Adam(gen_lr)
-            self.discriminator_optimizer = tf.keras.optimizers.Adam(dis_lr)
-        elif self.LOSS == "wasserstein":
-            self.generator_optimizer = tf.keras.optimizers.RMSprop(learning_rate=gen_lr, clipnorm=0.1)
-            self.discriminator_optimizer = tf.keras.optimizers.RMSprop(learning_rate=dis_lr, clipnorm=0.1)
+        self.generator_optimizer = tf.keras.optimizers.Adam(gen_lr)
+        self.discriminator_optimizer = tf.keras.optimizers.Adam(dis_lr)
 
         self.gui = None
 
@@ -72,8 +67,6 @@ class EmojiGan:
         self.generator_optimizer.apply_gradients(zip(gradients_of_generator, self.generator.trainable_variables))
         self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.discriminator.trainable_variables))
 
-        # TODO: BITTE KONTROLLIEREN, OB MAN IN TF.FUNCTION EINEN RETURN WERT HABEN KANN
-        # TODO: BITT AUCH MEINE BERECHNUNG WEITER UNTEN VON DEM RUNNING AVERAGE UEBERPRUEFEN
         return gen_loss, disc_loss
 
     @staticmethod
@@ -101,4 +94,3 @@ class EmojiGan:
                 img = PhotoImage(file='output/images/image_at_epoch_{:04d}.png'.format(epoch))
                 canvas_update[0].after(1, canvas_update[0].itemconfig(canvas_update[1], image=img))
                 print("Canvas updated.")
-        # plt.show()
