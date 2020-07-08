@@ -42,8 +42,8 @@ for epoch in range(training_instance.EPOCHS + 1):
     if epoch % 15 == 0:
         training_instance.checkpoint.save(file_prefix=training_instance.checkpoint_prefix)
     if use_gui:
-        gui_instance.image_canvas_update(path='output/images/image_at_epoch_{:04d}.png'.format(epoch),
-                                         progress_text_update=f"{epoch}/{training_instance.EPOCHS}")
+        gui_instance.image_canvas_update_1(path='output/images/image_at_epoch_{:04d}.png'.format(epoch),
+                                           progress_text_update=f"{epoch}/{training_instance.EPOCHS}")
 
     print(f'Epoch {format(epoch + 1, "4")}, Time {format(time.time() - start, ".2f")} sec, ' +
           f'Gen loss: {format(gen_loss_avg, ".4f")}, '
