@@ -25,8 +25,6 @@ class EmojiGan:
         self.generator_optimizer = tf.keras.optimizers.Adam(gen_lr)
         self.discriminator_optimizer = tf.keras.optimizers.Adam(dis_lr)
 
-        self.gui = None
-
         # ----- EXAMPLES ----- #
         # We reuse the same seed over time
         # -> Easier to visualize progress

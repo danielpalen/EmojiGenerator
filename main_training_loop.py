@@ -4,10 +4,10 @@ from EmojiGANTraining import EmojiGANTraining
 import tensorflow as tf
 
 # Avoid an error occuring on some GPU's when running tensorflow
-gpu_devices = tf.config.experimental.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(gpu_devices[0], True)
+# gpu_devices = tf.config.experimental.list_physical_devices('GPU')
+# tf.config.experimental.set_memory_growth(gpu_devices[0], True)
 
-use_gui = False
+use_gui = True
 
 training_instance = EmojiGANTraining()
 gui_instance = Gui(training_instance)
