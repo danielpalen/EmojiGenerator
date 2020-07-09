@@ -66,6 +66,7 @@ class Gui(threading.Thread):
         self.training_instance.load_ckpt_and_sample_img(filepath)
         tkinter_img = PhotoImage(file=filepath)
         self.sample_image_canvas.itemconfig(self.image_on_sample_canvas, image=tkinter_img)
+        print(f'SAMPLE IMAGE CREATED WITH DCGAN!')
 
     def tab3_button_pix2pix(self):
         """
@@ -74,28 +75,26 @@ class Gui(threading.Thread):
             Reads current image from tab3 image canvas and puts it in the pix2pix generator.
             Then displays the result in the image canvas.
         """
-        # TODO: Define input image correctly
+        if self.training_instance.emg is None or self.training_instance.emg.generator_sample is None:
+            print(f'Please sample DCGAN before applying pix2pix !')
+        else:
+            img = np.asarray(self.training_instance.emg.generator_sample)
+            if len(img.shape) == 2:  # Grayscale image
+                img = np.expand_dims(img, axis=2)
+                _img = img.copy()
 
-        img = imageio.imread('output/generator_sample.png')
-        print(np.asarray(img).shape)
-        prediction = predict_image_pix2pix(image=img, model_path='pix2pix_model.h5').numpy()
-        pil_img = Image.fromarray(prediction, 'RGB')
-        pil_img.save('pix2pix_sample_file.png')
-        # img = PhotoImage(file=prediction)
-        # self.sample_image_canvas.itemconfig(self.image_on_sample_canvas, image=img)
-        self.root.update()
+                img = np.concatenate((img, _img, _img), axis=2)  # Multiply the channels by 3
+                assert img.shape[2] == 3
+            elif len(img.shape) == 3 and img.shape[2] == 4:  # RGBA
+                NotImplementedError()
 
-        # TODO: ASK TIM ABOUT WHAT DIM HE NEEDS
-        # img = imageio.imread(f'output/generator_sample.png')
-        # pred = predict_image_pix2pix(image=img, model_path='pix2pix_model.h5').numpy()
-        # if len(pred.shape) == 2:  # Image is grayscale
-        #     plt.imshow(pred, cmap=f'gray')
-        # else:
-        #     plt.imshow(pred)
-        # plt.axis('off')
-        #
-        # plt.savefig(f'output/dcgan_to_emoji2emoji_sample.png')
-        # plt.close()
+            pred = predict_image_pix2pix(image=img, model_path='pix2pix_model.h5').numpy()
+            plt.imshow(pred)
+            plt.axis('off')
+
+            plt.savefig(f'output/dcgan_to_emoji2emoji_sample.png')
+            plt.close()
+            print(f'Sample image converted into color with pix2pix!')
 
     def image_canvas_update_1(self, path, progress_text_update):
         """

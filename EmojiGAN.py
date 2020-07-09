@@ -20,6 +20,7 @@ class EmojiGan:
 
         self.generator = None
         self.discriminator = None
+        self.generator_sample = None
 
         self.cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
@@ -99,6 +100,8 @@ class EmojiGan:
         noise = tf.random.normal([1, self.NOISE_DIM])  # 1 image with noise
         im = self.sample(noise)
         im = im[0]  # we only have 1 image
+
+        self.generator_sample = im
 
         if len(im.shape) == 2:  # Image is grayscale
             plt.imshow(im, cmap=f'gray')
