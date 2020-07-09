@@ -61,11 +61,10 @@ class Gui(threading.Thread):
             Samples from DCGAN, then saves sample to .png
             Then displays .png in greyscale.
         """
-        # TODO: Call sample method of self.training_instance here
-        sample_img = self.training_instance.sample().squeeze()
-        pil_img = Image.fromarray(sample_img, 'RGB')
-        pil_img.save('sample_file.png')
-        tkinter_img = PhotoImage(file='sample_file.png')
+        # TODO: Show file in GUI
+        filepath = f'output/generator_sample.png'
+        self.training_instance.load_ckpt_and_sample_img(filepath)
+        tkinter_img = PhotoImage(file=filepath)
         self.sample_image_canvas.itemconfig(self.image_on_sample_canvas, image=tkinter_img)
 
     def tab3_button_pix2pix(self):

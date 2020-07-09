@@ -99,8 +99,16 @@ class EmojiGANTraining:
             generator=self.emg.generator,
             discriminator=self.emg.discriminator)
 
-        if self.emg.RESTORE_CKPT.lower() in [f'true', f'1', f'y', f'yes']:
+        # Convert string (from GUI) to bool
+        if type(self.emg.RESTORE_CKPT) == str:
+            if self.emg.RESTORE_CKPT.lower() in [f'true', f'1', f'y', f'yes']:
+                self.emg.RESTORE_CKPT = True
+            else:
+                self.emg.RESTORE_CKPT = False
+
+        if self.emg.RESTORE_CKPT:
             self.checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
+            print(f'LAST CHECKPOINT LOADED (from output/checkpoint)')
 
         self.train_time = time.time()
 
@@ -109,17 +117,16 @@ class EmojiGANTraining:
         # can be exited.
         self.initialization_flag = True
 
-    def sample(self):
+    def load_ckpt_and_sample_img(self, filepath):
         """
             Generates a sample from the DCGAN architecture using the last checkpoint from output/checkpoints.
 
         """
         self.RESTORE_CHECKPOINT = True
         self.initialize()
-        noise = tf.random.normal([1, self.NOISE_DIM])
-        sample = self.emg.generator(noise, training=False).numpy()
+        self.emg.sample_and_save_single_image(filepath)
         self.RESTORE_CHECKPOINT = False
         self.initialization_flag = False
-        return sample
+        return True
 
 

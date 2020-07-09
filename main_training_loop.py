@@ -49,8 +49,7 @@ while True:
         disc_loss_avg = disc_loss_avg / batch_counter
 
         # Produce images for the GIF as we go
-        training_instance.emg.generate_and_save_images(training_instance.emg.generator, epoch + 1,
-                                                       training_instance.emg.SEED)
+        training_instance.emg.generate_and_save_images(epoch + 1)
 
         # Save the model every 15 epochs
         if epoch % 15 == 0:

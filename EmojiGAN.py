@@ -68,19 +68,14 @@ class EmojiGan:
 
         return gen_loss, disc_loss
 
-    @staticmethod
-    def generate_and_save_images(model, epoch, test_input):
+    def generate_and_save_images(self, epoch):
         # 'Training' = False, so net runs in inference mode (batchnorm)
-        predictions = model(test_input, training=False)
+        predictions = self.sample(self.SEED)
 
         fig = plt.figure(figsize=(4, 4))
 
         for i in range(predictions.shape[0]):
-            im = predictions[i].numpy()
-            if im.shape[2] == 1:  # Image is grayscale
-                im = np.squeeze(im, axis=2)
-            im = im * 127.5 + 127.5
-            im = im.astype(int)
+            im = predictions[i]
             plt.subplot(4, 4, i + 1)
             if len(im.shape) == 2:  # Image is grayscale
                 plt.imshow(im, cmap=f'gray')
@@ -91,3 +86,25 @@ class EmojiGan:
         plt.savefig('output/images/image_at_epoch_{:04d}.png'.format(epoch))
         plt.close(fig)
 
+    def sample(self, noise):
+        predictions = self.generator(noise, training=False).numpy()
+        predictions = predictions * 127.5 + 127.5 # Revert preprocessing
+        predictions = predictions.astype(int)
+        if predictions.shape[3] == 1:  # Image is grayscale
+            predictions = np.squeeze(predictions, axis=3)
+        print(predictions.shape)
+        return predictions
+
+    def sample_and_save_single_image(self, filepath):
+        noise = tf.random.normal([1, self.NOISE_DIM])  # 1 image with noise
+        im = self.sample(noise)
+        im = im[0]  # we only have 1 image
+
+        if len(im.shape) == 2:  # Image is grayscale
+            plt.imshow(im, cmap=f'gray')
+        else:
+            plt.imshow(im)
+        plt.axis('off')
+
+        plt.savefig(filepath)
+        plt.close()
