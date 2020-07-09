@@ -77,6 +77,7 @@ class Gui(threading.Thread):
         # TODO: Define input image correctly
 
         img = imageio.imread('output/generator_sample.png')
+        print(np.asarray(img).shape)
         prediction = predict_image_pix2pix(image=img, model_path='pix2pix_model.h5').numpy()
         pil_img = Image.fromarray(prediction, 'RGB')
         pil_img.save('pix2pix_sample_file.png')
