@@ -17,7 +17,10 @@ def create_gif(glob_img_path, gif_path):
         filenames = sorted(filenames)
         last = -1
 
-        for i in tqdm(range(len(filenames))):
+        # Only use approx. 20 images
+        step_size = len(filenames) // 20
+
+        for i in tqdm(range(0, len(filenames), step_size)):
             filename = filenames[i]
             frame = 2*(i**0.5)
             if round(frame) > round(last):
