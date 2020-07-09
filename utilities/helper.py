@@ -67,7 +67,7 @@ def load_image(image_file):
 
 
 def predict_image_pix2pix(image, model_path):
-    generator = tf.keras.models.load_model(model_path)
+    generator = tf.keras.models.load_model(model_path,compile=False)
 
     images = []
 
