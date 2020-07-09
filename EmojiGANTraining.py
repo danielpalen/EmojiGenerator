@@ -46,7 +46,7 @@ class EmojiGANTraining:
         assert color in [f'RGB', f'RGBA', f'gray']
 
         # ---------- CREATE DATASET ----------- #
-        reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_EMOJIS_DCGAN_TRAINING)
+        reader = EmojiReader(databases=[f'google'], emoji_names=constants.FACE_EMOJIS_DCGAN_TRAINING)
         images = reader.read_images_from_sheet(pixel=self.PIXEL_SIZE, debugging=False, png_format=color)
 
         images = preprocessing.apply_std_preprocessing(images)
@@ -80,7 +80,6 @@ class EmojiGANTraining:
             self.emg.discriminator = models.std_discriminator_model(
                 input_shape=[32, 32, 1], my_layers=[[64, 5, 2, 0.3], [128, 5, 2, 0.3]]
             )
-
         else:
             NotImplementedError()
 
@@ -100,7 +99,7 @@ class EmojiGANTraining:
             generator=self.emg.generator,
             discriminator=self.emg.discriminator)
 
-        if self.emg.RESTORE_CKPT:
+        if self.emg.RESTORE_CKPT.lower() in [f'true', f'1', f'y', f'yes']:
             self.checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
         self.train_time = time.time()
