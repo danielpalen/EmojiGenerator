@@ -178,6 +178,10 @@ class EmojiReader:
 
         self.images_as_np = np.asarray(images, dtype=np.float32)
 
+        # We always want our data to have 4 dimensions, even for grayscale (== last dim will be 1)
+        if len(self.images_as_np.shape) == 3:
+            self.images_as_np = np.expand_dims(self.images_as_np, axis=3)
+
         return self.images_as_np
 
 

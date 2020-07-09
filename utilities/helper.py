@@ -16,6 +16,8 @@ def create_tf_dataset_from_np(images, batch_size):
     """
 
     assert len(images.shape) == 4
+    assert images.shape[1] == images.shape[2]
+    assert images.shape[3] in [4, 3, 1]
 
     buffer_size = 60000
 

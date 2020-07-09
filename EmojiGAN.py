@@ -1,6 +1,7 @@
 import os
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import numpy as np
 from tkinter import PhotoImage
 # from utilities import gif
 
@@ -76,10 +77,15 @@ class EmojiGan:
 
         for i in range(predictions.shape[0]):
             im = predictions[i].numpy()
+            if im.shape[2] == 1:  # Image is grayscale
+                im = np.squeeze(im, axis=2)
             im = im * 127.5 + 127.5
             im = im.astype(int)
             plt.subplot(4, 4, i + 1)
-            plt.imshow(im)
+            if len(im.shape) == 2:  # Image is grayscale
+                plt.imshow(im, cmap=f'gray')
+            else:
+                plt.imshow(im)
             plt.axis('off')
 
         plt.savefig('output/images/image_at_epoch_{:04d}.png'.format(epoch))

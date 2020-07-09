@@ -1,3 +1,4 @@
+import sys
 import os
 import models
 import time
@@ -41,15 +42,12 @@ class EmojiGANTraining:
         :return: None
         """
 
-        # ---------- CREATE DATASET ----------- #
-        # At the moment we use 3 chanel images that are black and white
-        black_and_white = True
+        color = f'gray'
+        assert color in [f'RGB', f'RGBA', f'gray']
 
-        if black_and_white:
-            images = dataset_generation.generate_training_images()
-        else:
-            reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_SMILING_EMOJIS)
-            images = reader.read_images_from_sheet(pixel=self.PIXEL_SIZE, debugging=False, png_format='RGB')
+        # ---------- CREATE DATASET ----------- #
+        reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_EMOJIS_DCGAN_TRAINING)
+        images = reader.read_images_from_sheet(pixel=self.PIXEL_SIZE, debugging=False, png_format=color)
 
         images = preprocessing.apply_std_preprocessing(images)
 
@@ -62,15 +60,29 @@ class EmojiGANTraining:
             batch_size=self.BATCH_SIZE, noise_dim=self.NOISE_DIM, gen_lr=self.GEN_LR,
             dis_lr=self.DISC_LR, restore_ckpt=self.RESTORE_CHECKPOINT, examples=self.EXAMPLE_SIZE
         )
-        # Add Generator
-        self.emg.generator = models.std_generator_model(
-            noise_dim=self.NOISE_DIM, start_shape=[8, 8, 256],
-            my_layers=[[128, 5, 1], [64, 5, 2], [3, 5, 2]]
-        )
-        # Add Discriminator
-        self.emg.discriminator = models.std_discriminator_model(
-            input_shape=[32, 32, 3], my_layers=[[64, 5, 2, 0.3], [128, 5, 2, 0.3]]
-        )
+        if color == f'RGB':
+            # Add Generator
+            self.emg.generator = models.std_generator_model(
+                noise_dim=self.NOISE_DIM, start_shape=[8, 8, 256],
+                my_layers=[[128, 5, 1], [64, 5, 2], [3, 5, 2]]
+            )
+            # Add Discriminator
+            self.emg.discriminator = models.std_discriminator_model(
+                input_shape=[32, 32, 3], my_layers=[[64, 5, 2, 0.3], [128, 5, 2, 0.3]]
+            )
+        elif color == f'gray':
+            # Add Generator
+            self.emg.generator = models.std_generator_model(
+                noise_dim=self.NOISE_DIM, start_shape=[8, 8, 256],
+                my_layers=[[128, 5, 1], [64, 5, 2], [1, 5, 2]]
+            )
+            # Add Discriminator
+            self.emg.discriminator = models.std_discriminator_model(
+                input_shape=[32, 32, 1], my_layers=[[64, 5, 2, 0.3], [128, 5, 2, 0.3]]
+            )
+
+        else:
+            NotImplementedError()
 
         # ----- CHECKS ----- #
         # Generator and discirminator have been set
