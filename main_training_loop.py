@@ -69,8 +69,7 @@ while True:
             break
 
     # Generate after the final epoch
-    training_instance.emg.generate_and_save_images(training_instance.emg.generator, training_instance.EPOCHS,
-                                                   training_instance.emg.SEED)
+    training_instance.emg.generate_and_save_images(training_instance.EPOCHS)
 
     print(f'\nTRAINING FINISHED (Time: {format(time.time() - training_instance.train_time, ".2f")} sec)')
 

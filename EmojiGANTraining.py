@@ -46,7 +46,7 @@ class EmojiGANTraining:
         assert color in [f'RGB', f'RGBA', f'gray']
 
         # ---------- CREATE DATASET ----------- #
-        reader = EmojiReader(databases=[f'google'], emoji_names=constants.FACE_EMOJIS_DCGAN_TRAINING)
+        reader = EmojiReader(databases=[f'google'], emoji_names=constants.FACE_SMILING_EMOJIS)
         images = reader.read_images_from_sheet(pixel=self.PIXEL_SIZE, debugging=False, png_format=color)
 
         images = preprocessing.apply_std_preprocessing(images)
@@ -73,8 +73,8 @@ class EmojiGANTraining:
         elif color == f'gray':
             # Add Generator
             self.emg.generator = models.std_generator_model(
-                noise_dim=self.NOISE_DIM, start_shape=[8, 8, 256],
-                my_layers=[[128, 5, 1], [64, 5, 2], [1, 5, 2]]
+                noise_dim=self.NOISE_DIM, start_shape=[4, 4, 1024],
+                my_layers=[[512, 5, 2], [256, 5, 1], [128, 5, 2], [1, 5, 2]]
             )
             # Add Discriminator
             self.emg.discriminator = models.std_discriminator_model(
