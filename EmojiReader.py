@@ -102,10 +102,11 @@ class EmojiReader:
         """
 
         assert pixel in [16, 20, 32, 64]
-        assert png_format in [f'RGB', f'RGBA']
+        assert png_format in [f'RGB', f'RGBA', f'gray']
 
         if debugging:
-            shutil.rmtree('output/selected_emoji/')
+            if os.path.isdir(f'output/selected_emoji/'):
+                shutil.rmtree(f'output/selected_emoji/')
             os.mkdir(f'output/selected_emoji/')
 
         # Collects all emoji images
@@ -114,7 +115,10 @@ class EmojiReader:
         for db in self.databases:
             im_path = f'emoji-data/sheet_{db}_{pixel}.png'
 
-            # Images are as RGBA
+            # Holds the sheet with all emojis
+            # First loaded as RGBA
+            im = None
+
             if png_format == f'RGBA':
                 # Because the RGB values are random at places where
                 # alpha == 0, we set it manually to white
@@ -128,6 +132,9 @@ class EmojiReader:
                 background = Image.new(f'RGB', im.size, (255, 255, 255))
                 background.paste(im, mask=im.split()[3])  # 3 is the alpha channel
                 im = background
+
+                if png_format == f'gray':
+                    im = im.convert(f'L')
 
             im.show() if debugging else ...  # debug: show sheet
             im = np.asarray(im)
@@ -158,10 +165,13 @@ class EmojiReader:
                 images.append(emoji_im)
 
                 if debugging:
-                    plt.imshow(emoji_im)
+                    if png_format == f'gray':
+                        plt.imshow(emoji_im, cmap=f'gray')
+                    else:
+                        plt.imshow(emoji_im)
                     plt.savefig(f'output/selected_emoji/emoji_{i}.png')
                     plt.show()
-                    plt.clf()
+                    plt.close()
 
         print(f'{len(images)} images extracted from sheets')
         print(f'- img size = {pixel}, type = {png_format}, db = {self.databases}.\n')
@@ -172,5 +182,5 @@ class EmojiReader:
 
 
 if __name__ == '__main__':
-    reader = EmojiReader(databases=[f'apple', f'twitter', f'facebook'], categories=['Smileys & Emotion'])
-    reader.read_images_from_sheet(pixel=32)
+    reader = EmojiReader(databases=[f'apple', f'twitter', f'facebook', f'google'], categories=['Smileys & Emotion'])
+    reader.read_images_from_sheet(pixel=32, png_format="gray")
