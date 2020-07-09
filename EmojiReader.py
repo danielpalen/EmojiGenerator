@@ -169,7 +169,7 @@ class EmojiReader:
                         plt.imshow(emoji_im, cmap=f'gray')
                     else:
                         plt.imshow(emoji_im)
-                    plt.savefig(f'output/selected_emoji/emoji_{i}.png')
+                    plt.savefig(f'output/selected_emoji/emoji_{db}_{i}.png')
                     plt.show()
                     plt.close()
 
@@ -182,5 +182,5 @@ class EmojiReader:
 
 
 if __name__ == '__main__':
-    reader = EmojiReader(databases=[f'apple', f'twitter', f'facebook', f'google'], categories=['Smileys & Emotion'])
-    reader.read_images_from_sheet(pixel=32, png_format="gray")
+    reader = EmojiReader(databases=[f'apple', f'twitter', f'facebook', f'google'], emoji_names=constants.FACE_EMOJIS_DCGAN_TRAINING)
+    reader.read_images_from_sheet(pixel=32, png_format=f'gray', debugging=True)
