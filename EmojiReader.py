@@ -55,6 +55,7 @@ class EmojiReader:
 
         # Select emoji by name
         if emoji_names:
+            emoji_names = list(dict.fromkeys(emoji_names))
             self.selected_meta_data = []
             for i in range(len(self.FULL_META_DATA)):
                 name = self.FULL_META_DATA[i][f'name']
