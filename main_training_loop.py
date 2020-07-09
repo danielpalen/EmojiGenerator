@@ -2,6 +2,7 @@ import time
 from Gui import Gui
 from EmojiGANTraining import EmojiGANTraining
 import tensorflow as tf
+from utilities import gif
 
 # Avoid an error occuring on some GPU's when running tensorflow
 gpu_devices = tf.config.experimental.list_physical_devices('GPU')
@@ -20,8 +21,11 @@ else:
 # Main gui loop
 while True:
 
+    # Stop training after one training cycle, until button is pressed again
+    training_instance.training_flag = False
+
     # Sleep while training instance is not initialized and not ready for training
-    while ((not training_instance.initialization_flag) or (not training_instance.training_flag)) and use_gui:
+    while (not training_instance.initialization_flag or not training_instance.training_flag) and use_gui:
         time.sleep(0.01)
         gui_instance.root.update()
 
@@ -71,7 +75,8 @@ while True:
 
     print(f'\nTRAINING FINISHED (Time: {format(time.time() - training_instance.train_time, ".2f")} sec)')
 
-    # gif.create_gif(f'output/images/image*.png', f'output/emojigan.gif')
+    # Create gif
+    gif.create_gif(f'output/images/image*.png', f'output/emojigan.gif')
 
     # Exit gui while loop if no gui used
     if not use_gui:
