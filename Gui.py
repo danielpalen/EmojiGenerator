@@ -25,6 +25,7 @@ class Gui(threading.Thread):
         self.image_on_training_canvas = None
         self.sample_image_canvas = None
         self.image_on_sample_canvas = None
+        self.update_sample_canvas_flag = False
         self.training_instance = training_instance
         self.pix2pix_instance = None
         self.progress_text = None
@@ -45,7 +46,8 @@ class Gui(threading.Thread):
         self.training_instance.DISC_LR = float(self.entries[1].get())
         self.training_instance.PIXEL_SIZE = int(self.entries[5].get())
         self.training_instance.EXAMPLE_SIZE = int(self.entries[6].get())
-        self.training_instance.RESTORE_CHECKPOINT = self.entries[7].get()
+        self.training_instance.COLORSPACE = self.entries[7].get()
+        self.training_instance.RESTORE_CHECKPOINT = self.entries[8].get()
         self.training_instance.initialize()
 
     def tab2_button_func(self):
@@ -62,10 +64,10 @@ class Gui(threading.Thread):
             Then displays .png in greyscale.
         """
         # TODO: Show file in GUI
+
         filepath = f'output/generator_sample.png'
         self.training_instance.load_ckpt_and_sample_img(filepath)
-        tkinter_img = PhotoImage(file=filepath)
-        self.sample_image_canvas.itemconfig(self.image_on_sample_canvas, image=tkinter_img)
+        self.update_sample_canvas_flag = True
         print(f'SAMPLE IMAGE CREATED WITH DCGAN!')
 
     def tab3_button_pix2pix(self):
@@ -96,7 +98,7 @@ class Gui(threading.Thread):
             plt.close()
             print(f'Sample image converted into color with pix2pix!')
 
-    def image_canvas_update_1(self, path, progress_text_update):
+    def training_image_canvas_update(self, path, progress_text_update):
         """
             Updates the image canvas in tab 1.
 
@@ -108,6 +110,18 @@ class Gui(threading.Thread):
             self.training_image_canvas.itemconfig(self.image_on_training_canvas, image=img)
             self.progress_text.delete(1.0, END)
             self.progress_text.insert(END, progress_text_update)
+            self.root.update()
+
+    def sample_image_canvas_update(self, path):
+        """
+            Updates the image canvas in tab 3.
+
+        """
+        if not os.path.exists(path):
+            print("No sample found!")
+        else:
+            img = PhotoImage(file=path)
+            self.sample_image_canvas.itemconfig(self.image_on_sample_canvas, image=img)
             self.root.update()
 
     def build_gui(self):
@@ -134,8 +148,8 @@ class Gui(threading.Thread):
 
         # Hyperparameter entry widgets
         self.texts = ['Learning Rate Generator', 'Learning Rate Discriminator', 'Noise Dimension', 'Batch Size',
-                      'Iterations', 'Pixel Size', 'Example Size', 'Restore Checkpoint']
-        self.texts_defaults = ['2e-4', '2e-5', '100', '64', '1000', '32', '8', 'False']
+                      'Iterations', 'Pixel Size', 'Example Size', 'Colorspace', 'Restore Checkpoint']
+        self.texts_defaults = ['2e-4', '2e-5', '100', '64', '1000', '32', '8', f'gray', 'False']
         self.texts_labels = range(len(self.texts))
         self.entries = [Entry(tab1) for t in self.texts]
 
@@ -158,6 +172,13 @@ class Gui(threading.Thread):
                                          y=150 - self.training_image_canvas.winfo_height() / 2)
         self.image_on_training_canvas = self.training_image_canvas.create_image(250, 250, image=None)
 
+        # Canvas to display progress in the tab 3
+        self.sample_image_canvas = Canvas(tab3, width=500, height=500)
+        self.sample_image_canvas.pack()
+        self.sample_image_canvas.place(x=50 - self.training_image_canvas.winfo_width() / 2,
+                                       y=150 - self.training_image_canvas.winfo_height() / 2)
+        self.image_on_sample_canvas = self.sample_image_canvas.create_image(250, 250, image=None)
+
         # Initialization button
         Button(tab1, text='initialize', command=self.tab1_button_func,
                width=40).place(x=150, y=30 + (len(self.texts_labels) + 1)*60)
@@ -173,13 +194,6 @@ class Gui(threading.Thread):
 
         # Pix2Pix sample button
         Button(tab3, text='Convert by Pix2Pix', command=self.tab3_button_pix2pix, width=40).place(x=150, y=100)
-
-        self.sample_image_canvas = Canvas(tab3, width=500, height=500)
-        self.sample_image_canvas.pack()
-        self.sample_image_canvas.place(x=50 - self.training_image_canvas.winfo_width() / 2,
-                                       y=150 - self.training_image_canvas.winfo_height() / 2)
-
-        self.image_on_sample_canvas = self.sample_image_canvas.create_image(250, 250, image=None)
 
         # Update gui
         self.root.update()

@@ -93,7 +93,6 @@ class EmojiGan:
         predictions = predictions.astype(int)
         if predictions.shape[3] == 1:  # Image is grayscale
             predictions = np.squeeze(predictions, axis=3)
-        print(predictions.shape)
         return predictions
 
     def sample_and_save_single_image(self, filepath):

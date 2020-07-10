@@ -9,7 +9,7 @@ from EmojiReader import EmojiReader
 from utilities import constants
 from utilities import helper
 import preprocessing
-import dataset_generation
+# import dataset_generation
 
 
 class EmojiGANTraining:
@@ -23,7 +23,7 @@ class EmojiGANTraining:
         self.DISC_LR = 2e-4
         self.PIXEL_SIZE = 32
         self.EXAMPLE_SIZE = 8
-        # TODO: Seems to use checkpoint even tho this is set to false
+        self.COLORSPACE = f'gray'
         self.RESTORE_CHECKPOINT = False
 
         # ---------- OTHERS ---------- #
@@ -36,18 +36,15 @@ class EmojiGANTraining:
         self.checkpoint_prefix = None
 
     def initialize(self):
-        """ Runs the DCGAN training.
+        """ Initializes the DCGAN training.
 
-        :param: canvas_update: Image canvas of the gui, to display training progress.
-        :return: None
         """
 
-        color = f'gray'
-        assert color in [f'RGB', f'RGBA', f'gray']
+        assert self.COLORSPACE in [f'RGB', f'RGBA', f'gray']
 
         # ---------- CREATE DATASET ----------- #
         reader = EmojiReader(databases=[f'google'], emoji_names=constants.FACE_SMILING_EMOJIS)
-        images = reader.read_images_from_sheet(pixel=self.PIXEL_SIZE, debugging=False, png_format=color)
+        images = reader.read_images_from_sheet(pixel=self.PIXEL_SIZE, debugging=False, png_format=self.COLORSPACE)
 
         images = preprocessing.apply_std_preprocessing(images)
 
@@ -60,7 +57,7 @@ class EmojiGANTraining:
             batch_size=self.BATCH_SIZE, noise_dim=self.NOISE_DIM, gen_lr=self.GEN_LR,
             dis_lr=self.DISC_LR, restore_ckpt=self.RESTORE_CHECKPOINT, examples=self.EXAMPLE_SIZE
         )
-        if color == f'RGB':
+        if self.COLORSPACE == f'RGB':
             # Add Generator
             self.emg.generator = models.std_generator_model(
                 noise_dim=self.NOISE_DIM, start_shape=[8, 8, 256],
@@ -70,7 +67,7 @@ class EmojiGANTraining:
             self.emg.discriminator = models.std_discriminator_model(
                 input_shape=[32, 32, 3], my_layers=[[64, 5, 2, 0.3], [128, 5, 2, 0.3]]
             )
-        elif color == f'gray':
+        elif self.COLORSPACE == f'gray':
             # Add Generator
             self.emg.generator = models.std_generator_model(
                 noise_dim=self.NOISE_DIM, start_shape=[4, 4, 1024],

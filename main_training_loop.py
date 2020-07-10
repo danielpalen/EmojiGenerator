@@ -1,8 +1,9 @@
 import time
+import os
 from Gui import Gui
 from EmojiGANTraining import EmojiGANTraining
 import tensorflow as tf
-from utilities import gif
+# from utilities import gif
 
 # Avoid an error occuring on some GPU's when running tensorflow
 gpu_devices = tf.config.experimental.list_physical_devices('GPU')
@@ -27,6 +28,11 @@ while True:
     # Sleep while training instance is not initialized and not ready for training
     while (not training_instance.initialization_flag or not training_instance.training_flag) and use_gui:
         time.sleep(0.01)
+        if gui_instance.update_sample_canvas_flag:
+            print("I SHOULD UPDATE NOW.")
+            filepath = 'output/generator_sample.png'
+            gui_instance.sample_image_canvas_update(path=filepath)
+            gui_instance.update_sample_canvas_flag = False
         gui_instance.root.update()
 
     # ----- MAIN TRAINING LOOP ----- #
@@ -61,8 +67,8 @@ while True:
 
         # Update image canvas in trianing tab (tab 2) after each episode of training
         if use_gui:
-            gui_instance.image_canvas_update_1(path='output/images/image_at_epoch_{:04d}.png'.format(epoch),
-                                               progress_text_update=f"{epoch}/{training_instance.EPOCHS}")
+            gui_instance.training_image_canvas_update(path='output/images/image_at_epoch_{:04d}.png'.format(epoch),
+                                                      progress_text_update=f"{epoch}/{training_instance.EPOCHS}")
 
         # Break training loop if training button is pressed again
         if use_gui and training_instance.training_flag is False:
@@ -74,7 +80,7 @@ while True:
     print(f'\nTRAINING FINISHED (Time: {format(time.time() - training_instance.train_time, ".2f")} sec)')
 
     # Create gif
-    gif.create_gif(f'output/images/image*.png', f'output/emojigan.gif')
+    # gif.create_gif(f'output/images/image*.png', f'output/emojigan.gif')
 
     # Exit gui while loop if no gui used
     if not use_gui:
