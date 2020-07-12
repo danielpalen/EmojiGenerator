@@ -114,6 +114,8 @@ class EmojiGANTraining:
         # can be exited.
         self.initialization_flag = True
 
+        print(f'\nInitialization Done!')
+
     def load_ckpt_and_sample_img(self, filepath):
         """
             Generates a sample from the DCGAN architecture using the last checkpoint from output/checkpoints.
