@@ -3,11 +3,9 @@ from tkinter import ttk
 import random
 import os
 import threading
-import scipy.misc
 import matplotlib.pyplot as plt
 import numpy as np
-import imageio
-from PIL import Image
+
 
 from utilities.helper import predict_image_pix2pix
 
@@ -80,6 +78,7 @@ class Gui(threading.Thread):
         if self.training_instance.emg is None or self.training_instance.emg.generator_sample is None:
             print(f'Please sample DCGAN before applying pix2pix !')
         else:
+            print("REQUESTED PIX2PIX.")
             img = np.asarray(self.training_instance.emg.generator_sample)
             if len(img.shape) == 2:  # Grayscale image
                 img = np.expand_dims(img, axis=2)
@@ -90,7 +89,9 @@ class Gui(threading.Thread):
             elif len(img.shape) == 3 and img.shape[2] == 4:  # RGBA
                 NotImplementedError()
 
+            print("PIX2PIX PREDICTION....")
             pred = predict_image_pix2pix(image=img, model_path='pix2pix_model.h5').numpy()
+            print("... DONE")
             plt.imshow(pred)
             plt.axis('off')
 
