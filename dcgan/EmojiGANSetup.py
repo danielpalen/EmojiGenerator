@@ -6,6 +6,7 @@ from dcgan.EmojiGAN import EmojiGan
 from EmojiReader import EmojiReader
 from utilities import constants
 from utilities import helper
+import shutil
 
 
 class EmojiGANTraining:
@@ -100,22 +101,25 @@ class EmojiGANTraining:
             raise RuntimeError(f'The generator and discriminator have to be set before training.')
 
         # ----- CKPT CONFIG ----- #
-        if not os.path.exists(f'output/checkpoints/'):
-            os.mkdir(f'output/checkpoints/')
-        checkpoint_dir = 'output/checkpoints'
-        self.checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
-        self.checkpoint = tf.train.Checkpoint(
-            generator_optimizer=self.emg.generator_optimizer,
-            discriminator_optimizer=self.emg.discriminator_optimizer,
-            generator=self.emg.generator,
-            discriminator=self.emg.discriminator)
-
         # Convert string (from GUI) to bool
         if type(self.emg.RESTORE_CKPT) == str:
             if self.emg.RESTORE_CKPT.lower() in [f'true', f'1', f'y', f'yes']:
                 self.emg.RESTORE_CKPT = True
             else:
                 self.emg.RESTORE_CKPT = False
+
+        checkpoint_dir = f'output/checkpoints'
+        if not self.emg.RESTORE_CKPT:
+            shutil.rmtree(checkpoint_dir)
+        if not os.path.exists(checkpoint_dir):
+            os.mkdir(checkpoint_dir)
+
+        self.checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
+        self.checkpoint = tf.train.Checkpoint(
+            generator_optimizer=self.emg.generator_optimizer,
+            discriminator_optimizer=self.emg.discriminator_optimizer,
+            generator=self.emg.generator,
+            discriminator=self.emg.discriminator)
 
         if self.emg.RESTORE_CKPT:
             self.checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
