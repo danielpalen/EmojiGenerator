@@ -1,7 +1,7 @@
 import time
 import os
 from dcgan.Gui import Gui
-from dcgan.EmojiGANTraining import EmojiGANTraining
+from dcgan.EmojiGANSetup import EmojiGANTraining
 from utilities import gif
 
 # --------------- SET DEVICES --------------- #

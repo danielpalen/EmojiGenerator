@@ -8,11 +8,13 @@ from utilities import constants
 from utilities import helper
 
 
-# import dataset_generation
-
-
 class EmojiGANTraining:
-
+    """
+        Class for handling the training set generation
+        and the set up of our custom DCGAN networks,
+        which we subsequently train with the
+        methods provided in EmojiGAN.py
+    """
     def __init__(self):
         # ---------- HYPERPARAMETERS ---------- #
         self.NOISE_DIM = 100
@@ -35,14 +37,27 @@ class EmojiGANTraining:
         self.checkpoint_prefix = None
 
     def initialize(self):
-        """ Initializes the DCGAN training.
+        """
+            Read and select emojis with EmojiReader.py from hard
+            drive. Apply preprocessing to the images and create
+            a training dataset.
 
+            Then, create an EmojiGAN instance with parameters
+            either read from __init__ of this class (no GUI)
+            or entered via GUI.
+
+            Finally, we create a generator and discriminator
+            network using the modular classes in models.py
+            and pass them to the EmojiGAN instance.
+
+            After that training can be started (GUI: hitting
+            training button; No GUI: automatically).
         """
 
         assert self.COLORSPACE in [f'RGB', f'RGBA', f'gray']
 
         # ---------- CREATE DATASET ----------- #
-        reader = EmojiReader(databases=[f'google'], emoji_names=constants.FACE_SMILING_EMOJIS)
+        reader = EmojiReader(databases=[f'apple'], emoji_names=constants.FACE_SMILING_EMOJIS)
         images = reader.read_images_from_sheet(pixel=self.PIXEL_SIZE, debugging=False, png_format=self.COLORSPACE)
 
         images = preprocessing.apply_std_preprocessing(images)
@@ -80,7 +95,7 @@ class EmojiGANTraining:
             NotImplementedError()
 
         # ----- CHECKS ----- #
-        # Generator and discirminator have been set
+        # Generator and discriminator have been set
         if not self.emg.generator or not self.emg.discriminator:
             raise RuntimeError(f'The generator and discriminator have to be set before training.')
 
@@ -110,15 +125,15 @@ class EmojiGANTraining:
 
         # After initialization, this variable is set to True, so
         # the while loop of the GUI that waits for the user input
-        # can be exited.
+        # can be exited and the training is started.
         self.initialization_flag = True
 
         print(f'\nInitialization Done!')
 
     def load_ckpt_and_sample_img(self, filepath):
         """
-            Generates a sample from the DCGAN architecture using the last checkpoint from output/checkpoints.
-
+            Generates a sample from the DCGAN architecture using
+            the last checkpoint from output/checkpoints.
         """
         self.RESTORE_CHECKPOINT = True
         self.initialize()
