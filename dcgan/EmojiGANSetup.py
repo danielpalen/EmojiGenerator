@@ -25,8 +25,8 @@ class EmojiGANTraining:
         self.DISC_LR = 2e-4
         self.PIXEL_SIZE = 32
         self.EXAMPLE_SIZE = 8
-        self.COLORSPACE = f'gray'
-        self.RESTORE_CHECKPOINT = False
+        self.COLORSPACE = f'RGB'
+        self.RESTORE_CHECKPOINT = True
 
         # ---------- OTHERS ---------- #
         self.initialization_flag = False
