@@ -1,11 +1,11 @@
 from tkinter import *
 from tkinter import ttk
-import random
 import os
 import threading
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
+from PIL import Image
 
 
 from utilities.helper import predict_image_pix2pix
@@ -82,18 +82,23 @@ class Gui(threading.Thread):
         else:
             print("REQUESTED PIX2PIX.")
             img = np.asarray(self.training_instance.emg.generator_sample)
-            if len(img.shape) == 2:  # Grayscale image
-                img = np.expand_dims(img, axis=2)
-                _img = img.copy()
 
-                img = np.concatenate((img, _img, _img), axis=2)  # Multiply the channels by 3
-                assert img.shape[2] == 3
-            elif len(img.shape) == 3 and img.shape[2] == 4:  # RGBA
+            # Convert color into gray
+            if len(img.shape) == 3 and img.shape[2] == 4:  # RGBA
                 NotImplementedError()
+            elif len(img.shape) == 3 and img.shape[2] == 3:  # RGB
+                img = np.mean(img, axis=2)
+                print(img.shape)
 
-            print("PIX2PIX PREDICTION....")
-            pred = predict_image_pix2pix(image=img, model_path='pix2pix_model.h5').numpy()
-            print("... DONE")
+            # Extend grayscale image from 1 to 3 dimensions
+            img = np.expand_dims(img, axis=2)
+            _img = img.copy()
+            img = np.concatenate((img, _img, _img), axis=2)
+            assert img.shape[2] == 3
+
+            print("PIX2PIX PREDICTION ... ", end=f'')
+            pred = predict_image_pix2pix(image=img, model_path='output/pix2pix_model.h5').numpy()
+            print("DONE!")
             plt.figure()
             plt.imshow(pred)
             plt.axis('off')
