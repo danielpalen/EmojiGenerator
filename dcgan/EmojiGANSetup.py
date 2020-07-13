@@ -39,8 +39,8 @@ class EmojiGANTraining:
     def initialize(self):
         """
             Read and select emojis with EmojiReader.py from hard
-            drive. Apply preprocessing to the images and create
-            a training dataset.
+            drive. Apply preprocessing from preprocessing.py
+            to the images and create a training dataset.
 
             Then, create an EmojiGAN instance with parameters
             either read from __init__ of this class (no GUI)
