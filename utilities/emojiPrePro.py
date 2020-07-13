@@ -1,5 +1,4 @@
 import imageio
-#from pandas import np
 import random
 import numpy as np
 

@@ -1,5 +1,4 @@
 import numpy as np
-import tensorflow as tf
 
 
 def apply_std_preprocessing(images):

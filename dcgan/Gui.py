@@ -5,8 +5,6 @@ import threading
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
-from PIL import Image
-
 
 from utilities.helper import predict_image_pix2pix
 
@@ -61,7 +59,6 @@ class Gui(threading.Thread):
             Samples from DCGAN, then saves sample to .png
             Then displays .png in greyscale.
         """
-        # TODO: Show file in GUI
         filepath = f'output/generator_sample.png'
         self.training_instance.load_ckpt_and_sample_img(filepath)
         print(f'SAMPLE IMAGE CREATED WITH DCGAN!')

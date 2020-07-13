@@ -67,7 +67,6 @@ def generate_training_images(filepath=f'output/training_images', number_images=1
 
         for x in tqdm(range(number_images // 2)):
 
-
             # Create pictures cut from top (high) and bottom (low) half of the image
             for pos in [f'h', f'l']:
                 rand_images = []

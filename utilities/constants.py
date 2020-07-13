@@ -1,10 +1,8 @@
-
-'''
+"""
 Visit https://unicode.org/emoji/charts/full-emoji-list.html
 - to get a full list of emojis
 - to understand the grouping of emojis
-'''
-
+"""
 
 # The 13 "standard" friendly emojis
 # All should be available in all 4 databases

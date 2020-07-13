@@ -1,7 +1,5 @@
-import imageio
 import tensorflow as tf
 import numpy as np
-from matplotlib import pyplot as plt
 
 
 def create_tf_dataset_from_np(images, batch_size):

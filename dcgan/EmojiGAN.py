@@ -2,8 +2,6 @@ import os
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
-from tkinter import PhotoImage
-# from utilities import gif
 
 
 class EmojiGan:
