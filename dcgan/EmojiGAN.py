@@ -106,5 +106,5 @@ class EmojiGan:
             plt.imshow(im)
         plt.axis('off')
 
-        plt.savefig(filepath)
+        plt.savefig(filepath, dpi=200)
         plt.close()
