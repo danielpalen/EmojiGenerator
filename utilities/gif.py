@@ -1,7 +1,6 @@
 
 import glob
 import imageio
-from tqdm import tqdm
 
 
 def create_gif(glob_img_path, gif_path):
@@ -20,7 +19,7 @@ def create_gif(glob_img_path, gif_path):
         # Only use approx. 20 images
         step_size = len(filenames) // 20
 
-        for i in tqdm(range(0, len(filenames), step_size)):
+        for i in range(0, len(filenames), step_size):
             filename = filenames[i]
             frame = 2*(i**0.5)
             if round(frame) > round(last):

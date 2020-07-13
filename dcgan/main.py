@@ -1,19 +1,17 @@
 import time
 import os
-from Gui import Gui
-from EmojiGANTraining import EmojiGANTraining
-import tensorflow as tf
-from tensorflow.python.client import device_lib
-# from utilities import gif
+from dcgan.Gui import Gui
+from dcgan.EmojiGANTraining import EmojiGANTraining
+from utilities import gif
 
-TF_FORCE_GPU_ALLOW_GROWTH = True
-
+# --------------- SET DEVICES --------------- #
 # Decide, whether you want to train on CPU only
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 # Uncomment if your GPU needs the command
 # gpu_devices = tf.config.experimental.list_physical_devices('GPU')
 # tf.config.experimental.set_memory_growth(gpu_devices[0], True)
+
 
 use_gui = True
 
@@ -89,7 +87,7 @@ while True:
     print(f'\nTRAINING FINISHED (Time: {format(time.time() - training_instance.train_time, ".2f")} sec)')
 
     # Create gif
-    # gif.create_gif(f'output/images/image*.png', f'output/emojigan.gif')
+    gif.create_gif(f'output/images/image*.png', f'output/emojigan.gif')
 
     # Exit gui while loop if no gui used
     if not use_gui:

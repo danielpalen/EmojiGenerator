@@ -1,14 +1,13 @@
-import sys
 import os
-import models
+from dcgan import models, preprocessing
 import time
 import tensorflow as tf
-import numpy as np
-from EmojiGAN import EmojiGan
+from dcgan.EmojiGAN import EmojiGan
 from EmojiReader import EmojiReader
 from utilities import constants
 from utilities import helper
-import preprocessing
+
+
 # import dataset_generation
 
 
