@@ -100,9 +100,9 @@ class Gui(threading.Thread):
             plt.imshow(pred)
             plt.axis('off')
 
-            plt.savefig(f'output/dcgan_to_emoji2emoji_sample.png')
+            plt.savefig(f'output/dcgan_to_emoji2emoji_sample.png', dpi=300)
             plt.show()
-            # plt.close()
+            plt.close()
             print(f'Sample image converted into color with pix2pix!')
 
     def training_image_canvas_update(self, path, progress_text_update):
