@@ -113,7 +113,7 @@ class Gui(threading.Thread):
             Updates the image canvas in tab 1.
         """
         if not os.path.exists(path):
-            print("Image canvas path not existent!")
+            pass
         else:
             img = PhotoImage(file=path)
             self.training_image_canvas.itemconfig(self.image_on_training_canvas, image=img)
