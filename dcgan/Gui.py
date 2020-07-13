@@ -142,7 +142,7 @@ class Gui(threading.Thread):
         # Hyperparameter entry widgets
         self.texts = ['Learning Rate Generator', 'Learning Rate Discriminator', 'Noise Dimension', 'Batch Size',
                       'Iterations', 'Pixel Size', 'Example Size', 'Colorspace', 'Restore Checkpoint']
-        self.texts_defaults = ['2e-4', '2e-5', '100', '64', '1000', '32', '16', f'RGB', 'False']
+        self.texts_defaults = ['2e-4', '2e-5', '100', '64', '1000', '32', '16', f'RGB', 'True']
         self.texts_labels = range(len(self.texts))
         self.entries = [Entry(tab1) for t in self.texts]
 
