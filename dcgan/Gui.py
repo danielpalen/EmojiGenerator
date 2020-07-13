@@ -36,7 +36,6 @@ class Gui(threading.Thread):
     def tab1_button_func(self):
         """
             Defines what happens when the button in tab 1 is pressed.
-
         """
         self.training_instance.NOISE_DIM = int(self.entries[2].get())
         self.training_instance.EPOCHS = int(self.entries[4].get())
@@ -107,7 +106,6 @@ class Gui(threading.Thread):
     def training_image_canvas_update(self, path, progress_text_update):
         """
             Updates the image canvas in tab 1.
-
         """
         if not os.path.exists(path):
             print("Image canvas path not existent!")
@@ -118,24 +116,10 @@ class Gui(threading.Thread):
             self.progress_text.insert(END, progress_text_update)
             self.root.update()
 
-    def sample_image_canvas_update(self, path):
-        """
-            Updates the image canvas in tab 3.
-
-        """
-        # TODO: Not used, delete
-        if not os.path.exists(path):
-            print("No sample found!")
-        else:
-            img = PhotoImage(file=path)
-            self.sample_image_canvas.itemconfig(self.image_on_sample_canvas, image=img)
-            self.root.update()
-
     def build_gui(self):
         """
             Initializes and builds all elements of the gui.
             Then updates the root node once to display it.
-
         """
         # Root node
         self.root = Tk()
@@ -156,7 +140,7 @@ class Gui(threading.Thread):
         # Hyperparameter entry widgets
         self.texts = ['Learning Rate Generator', 'Learning Rate Discriminator', 'Noise Dimension', 'Batch Size',
                       'Iterations', 'Pixel Size', 'Example Size', 'Colorspace', 'Restore Checkpoint']
-        self.texts_defaults = ['2e-4', '2e-5', '100', '64', '1000', '32', '8', f'gray', 'False']
+        self.texts_defaults = ['2e-4', '2e-5', '100', '64', '1000', '32', '16', f'RGB', 'False']
         self.texts_labels = range(len(self.texts))
         self.entries = [Entry(tab1) for t in self.texts]
 
