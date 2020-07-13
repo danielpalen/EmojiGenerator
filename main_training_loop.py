@@ -34,11 +34,14 @@ while True:
     # Sleep while training instance is not initialized and not ready for training
     while (not training_instance.initialization_flag or not training_instance.training_flag) and use_gui:
         time.sleep(0.01)
+        # TODO: Delete comment block
+        """
         if gui_instance.update_sample_canvas_flag:
             print("I SHOULD UPDATE NOW.")
             filepath = 'output/generator_sample.png'
             gui_instance.sample_image_canvas_update(path=filepath)
             gui_instance.update_sample_canvas_flag = False
+        """
         gui_instance.root.update()
 
     # ----- MAIN TRAINING LOOP ----- #
