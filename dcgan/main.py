@@ -23,6 +23,9 @@ if use_gui:
 else:
     training_instance.initialize()
 
+# --------------- CREATE OUTPUT FOLDER --------------- #
+if not os.path.isdir(f'output'):
+    os.mkdir(f'output')
 
 # --------------- GUI LOOP --------------- #
 while True:
@@ -54,7 +57,7 @@ while True:
         gen_loss_avg = gen_loss_avg / batch_counter
         disc_loss_avg = disc_loss_avg / batch_counter
 
-        # Produce and save image for the example SEED we have set
+        # Save images for the example SEEDs we have set (@ output/images/)
         training_instance.emg.generate_and_save_images(epoch + 1)
 
         # Save the model every 50 epochs
@@ -74,7 +77,7 @@ while True:
         if use_gui and training_instance.training_flag is False:
             break
 
-    # Produce and save image for the example SEED we have set for final epoche
+    # Save images for the example SEEDs we have set for final epoch (@ output/images/)
     training_instance.emg.generate_and_save_images(training_instance.EPOCHS)
 
     print(f'\nTRAINING FINISHED (Time: {format(time.time() - training_instance.train_time, ".2f")} sec)')
