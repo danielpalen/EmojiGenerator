@@ -145,13 +145,8 @@ class Gui(threading.Thread):
         self.entries = [Entry(tab1) for t in self.texts]
 
         for label in self.texts_labels:
-            # Colors
-            ct = [random.randrange(256) for x in range(3)]
-            ct_hex = "%02x%02x%02x" % tuple(ct)
-            bg_colour = '#' + "".join(ct_hex)
-
             # Labels for training hyperparameters
-            lab = Label(tab1, text=self.texts[label], bg=bg_colour)
+            lab = Label(tab1, text=self.texts[label], bg=f'#84ACBA')
             lab.place(x=20, y=30 + label*60, width=200, height=50)
             self.entries[label].place(x=250, y=30 + label*60, width=200, height=50)
             self.entries[label].insert(0, self.texts_defaults[label])
