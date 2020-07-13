@@ -4,6 +4,7 @@ import random
 import os
 import threading
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import numpy as np
 
 
@@ -62,11 +63,13 @@ class Gui(threading.Thread):
             Then displays .png in greyscale.
         """
         # TODO: Show file in GUI
-
         filepath = f'output/generator_sample.png'
         self.training_instance.load_ckpt_and_sample_img(filepath)
-        self.update_sample_canvas_flag = True
         print(f'SAMPLE IMAGE CREATED WITH DCGAN!')
+        img = mpimg.imread(filepath)
+        plt.figure()
+        plt.imshow(img)
+        plt.show()
 
     def tab3_button_pix2pix(self):
         """
@@ -92,11 +95,13 @@ class Gui(threading.Thread):
             print("PIX2PIX PREDICTION....")
             pred = predict_image_pix2pix(image=img, model_path='pix2pix_model.h5').numpy()
             print("... DONE")
+            plt.figure()
             plt.imshow(pred)
             plt.axis('off')
 
             plt.savefig(f'output/dcgan_to_emoji2emoji_sample.png')
-            plt.close()
+            plt.show()
+            # plt.close()
             print(f'Sample image converted into color with pix2pix!')
 
     def training_image_canvas_update(self, path, progress_text_update):
@@ -118,6 +123,7 @@ class Gui(threading.Thread):
             Updates the image canvas in tab 3.
 
         """
+        # TODO: Not used, delete
         if not os.path.exists(path):
             print("No sample found!")
         else:
