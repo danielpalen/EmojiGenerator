@@ -2,7 +2,6 @@ import os
 from EmojiReader import EmojiReader
 from utilities import constants
 from utilities.emojiPrePro import *
-from tqdm import tqdm
 
 
 def generate_training_images(filepath=f'output/training_images', number_images=1000, size=32, mode="grey"):
@@ -65,7 +64,7 @@ def generate_training_images(filepath=f'output/training_images', number_images=1
 
         print(f'Generate training images in {filepath}!')
 
-        for x in tqdm(range(number_images // 2)):
+        for x in range(number_images // 2):
 
             # Create pictures cut from top (high) and bottom (low) half of the image
             for pos in [f'h', f'l']:
@@ -108,7 +107,7 @@ def generate_training_images(filepath=f'output/training_images', number_images=1
 
     else:
         print(f'Loading already created training data from {filepath} ')
-        for file in tqdm(os.listdir(filepath)):
+        for file in os.listdir(filepath):
             filename = os.fsdecode(file)
             images.append(imageio.imread(filepath + os.sep + filename))
         return np.asarray(images, dtype=np.float32)
