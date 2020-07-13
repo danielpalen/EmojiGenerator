@@ -3,11 +3,17 @@ import os
 from Gui import Gui
 from EmojiGANTraining import EmojiGANTraining
 import tensorflow as tf
+from tensorflow.python.client import device_lib
 # from utilities import gif
 
-# Avoid an error occuring on some GPU's when running tensorflow
-gpu_devices = tf.config.experimental.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(gpu_devices[0], True)
+TF_FORCE_GPU_ALLOW_GROWTH = True
+
+# Decide, whether you want to train on CPU only
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
+# Uncomment if your GPU needs the command
+# gpu_devices = tf.config.experimental.list_physical_devices('GPU')
+# tf.config.experimental.set_memory_growth(gpu_devices[0], True)
 
 use_gui = True
 
